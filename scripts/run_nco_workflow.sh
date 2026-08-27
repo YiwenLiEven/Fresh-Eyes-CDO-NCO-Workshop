@@ -17,5 +17,4 @@ ncatted -O \
 
 test "$(cdo -s ntime "${outdir}/tas_1981_2010.nc")" -eq 360
 echo "NCO selected tas and 360 monthly time steps."
-ncks -m -v tas "${outdir}/tas_1981_2010.nc" | head -n 25
-
+ncks -m -v tas "${outdir}/tas_1981_2010.nc" | sed -n '1,25p'

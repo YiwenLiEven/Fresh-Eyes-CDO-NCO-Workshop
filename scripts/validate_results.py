@@ -48,8 +48,14 @@ def main() -> None:
 
     report: dict[str, dict[str, float | bool]] = {}
     for name, (cdo_file, py_file, variable, tolerance) in comparisons.items():
-        cdo_data = xr.open_dataset(cdo_file, use_cftime=True)[variable]
-        py_data = xr.open_dataset(py_file, use_cftime=True)[variable]
+        # CDO climatology operators may encode representative timestamps
+        # outside the range accepted by datetime decoders. The validation is
+        # intentionally positional, so time decoding is neither needed nor
+        # scientifically relevant here.
+        with xr.open_dataset(cdo_file, decode_times=False) as cdo_ds:
+            cdo_data = cdo_ds[variable].load()
+        with xr.open_dataset(py_file, decode_times=False) as py_ds:
+            py_data = py_ds[variable].load()
         difference = max_abs(cdo_data, py_data)
         report[name] = {
             "max_absolute_difference": difference,
@@ -70,4 +76,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
