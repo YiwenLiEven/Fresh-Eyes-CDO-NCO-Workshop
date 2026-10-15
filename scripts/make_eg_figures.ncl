@@ -22,7 +22,7 @@ begin
   mr@gsnAddCyclic = True
   mr@mpProjection = "Robinson"
   mr@mpCenterLonF = 0.0
-  mr@mpShapeMode = "FreeAspect"
+  mr@mpShapeMode = "FixedAspect"
   mr@mpPerimOn = False
   mr@mpFillOn = False
   mr@mpOutlineOn = True

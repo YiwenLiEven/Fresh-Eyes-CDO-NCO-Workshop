@@ -50,6 +50,8 @@ Python independently reproduces the calculation and validates all four numerical
 
 ## Participant quick start with Binder
 
+**Launch status:** Codespaces workflows and both seminar notebooks pass. The live mybinder.org launch is **not yet verified**: its event-stream connection returned HTTP 403. This does not establish whether the Binder image built successfully. Use Codespaces or the [executed demo backup](docs/executed/00_yl_20_minute_binder_demo.ipynb) until a fresh Binder session opens and runs all cells successfully.
+
 1. Select **Launch YL seminar in Binder** above.
 2. Wait for JupyterLab to open directly on `00_yl_20_minute_binder_demo.ipynb`.
 3. Run the notebook from top to bottom, or follow the time-stamped presenter prompts.
