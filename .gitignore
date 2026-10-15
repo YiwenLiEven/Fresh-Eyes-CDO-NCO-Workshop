@@ -8,4 +8,3 @@ data/work/
 data/demo/
 outputs/*
 !outputs/.gitkeep
-

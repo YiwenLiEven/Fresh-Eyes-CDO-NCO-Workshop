@@ -31,8 +31,8 @@ def build_dataset() -> xr.Dataset:
         base[None, :, None]
         + spatial_pattern[None, :, :]
         + seasonal[:, None, None] * seasonal_pattern[None, :, None]
-        + trend[:, None, None]
-        + multidecadal[:, None, None]
+        + trend[:, None, None] * (1.0 + 0.8 * np.sin(lat_r)[None, :, None] ** 2)
+        + multidecadal[:, None, None] * (1.0 + 0.2 * np.cos(lon_r)[None, None, :])
     ).astype(np.float32)
 
     ds = xr.Dataset(

@@ -1,5 +1,7 @@
 # Mapping the Original Fresh Eyes Python Workshop to CDO and NCO
 
+The current Binder presentation targets EG's compressed shared example. See [EG_SHARED_NOTEBOOK_MAPPING.md](EG_SHARED_NOTEBOOK_MAPPING.md) for monthly anomalies and Arctic means. This document retains the audit of Abhnil's broader original workshop.
+
 ## Source reviewed
 
 Original repository: [abhnil/Fresh_Eyes_on_CMIP_Data_Workshop](https://github.com/abhnil/Fresh_Eyes_on_CMIP_Data_Workshop)
@@ -49,7 +51,7 @@ The review covers all three notebooks in the source repository as available in A
 | Subtract baseline | `annual - baseline` | `subc` | `ncap2` | Yes | Use CDO and NCO metadata cleanup |
 | Edit names/attributes | xarray attributes | `setattribute` | `ncrename`, `ncatted` | Yes | Use NCO |
 | Robinson map | cartopy | Not a processing task | Not a processing task | No direct replacement intended | Keep Python visualization |
-| Climate stripes | matplotlib | Not a processing task | Not a processing task | No direct replacement intended | CDO/NCO prepare; Python plots |
+| Climate stripes | matplotlib | Not a processing task | Not a processing task | Plotting is separate from CDO/NCO | CDO/NCO prepare; NCL plots; Python alternative retained |
 
 ## Tasks not present in the source notebooks
 
@@ -84,4 +86,3 @@ The intended message is complementarity, not competition:
 
 > Use CDO/NCO to prepare the data.  
 > Use Python to understand the data.
-

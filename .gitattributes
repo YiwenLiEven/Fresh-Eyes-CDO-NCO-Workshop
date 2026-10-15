@@ -1,7 +1,11 @@
+* text=auto eol=lf
 *.ipynb text eol=lf
 *.py text eol=lf
 *.sh text eol=lf
+*.ncl text eol=lf
+*.yml text eol=lf
 *.md text eol=lf
+binder/postBuild text eol=lf
+binder/*.txt text eol=lf
 *.nc binary
 *.png binary
-

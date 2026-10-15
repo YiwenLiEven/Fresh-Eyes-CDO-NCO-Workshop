@@ -1,0 +1,39 @@
+{
+  "completed_utc": "2026-10-15T07:28:30.943962+00:00",
+  "python": "3.11.13",
+  "packages": {
+    "xarray": "2026.9.0",
+    "numpy": "2.4.6",
+    "netCDF4": "1.7.4",
+    "nbconvert": "7.17.2"
+  },
+  "tools": {
+    "cdo": "Climate Data Operators version 2.1.1 (https://mpimet.mpg.de/cdo)\nSystem: x86_64-pc-linux-gnu\nCXX Compiler: g++ -g -O2 -ffile-prefix-map=/build/reproducible-path/cdo-2.1.1=. -fstack-protector-strong -Wformat -Werror=format-security -fopenmp -pthread\nCXX version : g++ (Debian 12.2.0-14) 12.2.0\nC Compiler: gcc -g -O2 -ffile-prefix-map=/build/reproducible-path/cdo-2.1.1=. -fstack-protector-strong -Wformat -Werror=format-security -Wall -pedantic -fPIC -fopenmp -pthread -pthread\nC version : gcc (Debian 12.2.0-14) 12.2.0\nF77 Compiler: f77 -g -O2 -ffile-prefix-map=/build/reproducible-path/cdo-2.1.1=. -fstack-protector-strong\nF77 version : GNU Fortran (Debian 12.2.0-14) 12.2.0\nFeatures: 7GB 2threads c++17 OpenMP45 Fortran pthreads HDF5 NC4/HDF5/threadsafe OPeNDAP sz udunits2 proj magics curl fftw3 sse2\nLibraries: yac/2.6.1 HDF5/1.10.8 proj/9.1.1 curl/7.88.1 magics/4.13.0\nCDI data types: SizeType=size_t\nCDI file types: srv ext ieg grb1 grb2 nc1 nc2 nc4 nc4c nc5 nczarr \n     CDI library version : 2.1.1\n ecCodes library version : 2.28.0\n  NetCDF library version : 4.9.0 of Aug  7 2022 23:41:41 $\n    HDF5 library version : library undefined\n    exse library version : 1.4.2\n    FILE library version : 1.9.1",
+    "ncks": "NCO netCDF Operators version 5.1.4 \"Bakhmut\" built by buildd on x86-ubc-01 at Aug 10 2023 17:23:45\nncks version 5.1.4",
+    "ncl": "6.6.2"
+  },
+  "shared_reference_commit": "393cfcf876fa47c6c231c3be70dbd9f8552fe3a3",
+  "monthly_validation": {
+    "monthly_anomaly_1979_2014": {
+      "max_absolute_difference": 7.62939453125e-06,
+      "tolerance": 0.0003,
+      "passed": true
+    },
+    "mean_monthly_anomaly_map_1979_2014": {
+      "max_absolute_difference": 1.9073486328125e-06,
+      "tolerance": 0.0003,
+      "passed": true
+    },
+    "arctic_monthly_unweighted_1979_2014": {
+      "max_absolute_difference": 4.172325134277344e-07,
+      "tolerance": 0.0003,
+      "passed": true
+    },
+    "arctic_annual_unweighted_1979_2014": {
+      "max_absolute_difference": 5.960464477539063e-08,
+      "tolerance": 0.0003,
+      "passed": true
+    }
+  },
+  "notebooks_executed": true
+}

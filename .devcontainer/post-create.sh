@@ -9,9 +9,10 @@ if [[ -f /etc/apt/sources.list.d/yarn.list ]]; then
 fi
 
 sudo apt-get update
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -o Dpkg::Options::=--force-confold \
   cdo \
   nco \
+  ncl-ncarg \
   netcdf-bin \
   make
 
@@ -23,4 +24,4 @@ pytest -q
 
 echo
 echo "Workshop environment is ready."
-echo "Open notebooks/00_opening_demo.ipynb to begin."
+echo "Open notebooks/00_yl_20_minute_binder_demo.ipynb to begin."

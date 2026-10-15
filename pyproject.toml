@@ -11,6 +11,7 @@ dependencies = [
   "cftime>=1.6",
   "ipykernel>=6.29",
   "jupyterlab>=4.2",
+  "nbconvert>=7.16,<8",
   "matplotlib>=3.9",
   "netCDF4>=1.7",
   "numpy>=2.0",

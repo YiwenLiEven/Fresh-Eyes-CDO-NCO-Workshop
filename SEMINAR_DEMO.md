@@ -1,6 +1,6 @@
 # Seminar Demonstration Runbook
 
-This runbook supports a 45–60 minute seminar plus a 20–30 minute hands-on session.
+This is the extended 45–60 minute workshop runbook. For YL's current 20-minute Binder contribution based on EG's monthly-anomaly example, use [YL_20_MINUTE_SEMINAR.md](YL_20_MINUTE_SEMINAR.md) and `00_yl_20_minute_binder_demo.ipynb`.
 
 ## Before the seminar
 
@@ -8,7 +8,7 @@ This runbook supports a 45–60 minute seminar plus a 20–30 minute hands-on se
 2. Confirm that `.devcontainer/post-create.sh` finishes successfully.
 3. Open `notebooks/00_opening_demo.ipynb` and select the Python kernel.
 4. Run all cells once.
-5. Keep `outputs/demo/climate_stripes.png` open in a second editor tab.
+5. Keep `outputs/demo/climate_stripes_ncl.png` open in a second editor tab.
 6. Optionally run `make real-data` before the session if the venue network is reliable.
 
 ## Core message
@@ -67,18 +67,21 @@ python scripts/validate_results.py
 
 Show `outputs/demo/validation.json`. The important result is not identical byte layout; it is agreement within an explicit numerical tolerance.
 
-### 35–45 minutes: Python visualization
+### 35–45 minutes: NCL stripes and Python interpretation
 
 Run:
 
 ```bash
-python scripts/make_stripes.py
+STRIPES_INPUT=outputs/demo/cdo/tas_global_annual_anomaly.nc \
+STRIPES_OUTPUT_BASE=outputs/demo/climate_stripes_ncl \
+ncl scripts/make_stripes.ncl
 ```
 
 Make the division of labor visible:
 
 ```text
-CDO/NCO -> small analysis-ready NetCDF -> Python -> explanation and visualization
+CDO/NCO -> small analysis-ready NetCDF -> NCL stripes
+                                      -> Python validation and interpretation
 ```
 
 ## Hands-on segment
@@ -96,4 +99,3 @@ Participants should complete these tasks in order:
 - If notebook execution is slow, run `bash scripts/run_all.sh` in the terminal and use the notebooks only for explanation.
 - If a participant changes a notebook irreversibly, use GitHub’s source-control panel to discard only that notebook’s changes.
 - Never depend on a live 219 MB download for the opening demo.
-

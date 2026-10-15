@@ -1,0 +1,36 @@
+name: Verify climate workshop
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scientific-equivalence:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install climate tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y -o Dpkg::Options::=--force-confold cdo nco ncl-ncarg netcdf-bin
+      - name: Install Python package
+        run: python -m pip install -e .
+      - name: Execute scientific workflows and seminar notebooks
+        run: bash binder/postBuild
+      - name: Save figures, comparisons and executed notebooks
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: seminar-verification
+          path: |
+            outputs/verification.json
+            outputs/demo/*validation.json
+            outputs/demo/monthly/*.png
+            outputs/demo/*ncl*.log
+            outputs/executed/*.ipynb

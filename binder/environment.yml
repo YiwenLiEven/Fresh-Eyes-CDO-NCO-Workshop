@@ -1,0 +1,19 @@
+name: fresh-eyes
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - cdo>=2.2,<3
+  - nco>=5,<6
+  - ncl=6.6.2
+  - cftime>=1.6
+  - ipykernel>=6.29
+  - jupyterlab>=4.2,<5
+  - nbconvert>=7.16,<8
+  - matplotlib>=3.9,<4
+  - netcdf4>=1.7
+  - numpy>=2,<3
+  - pandas>=2.2,<3
+  - pytest>=8.3,<9
+  - xarray>=2024.7
+  - pip
