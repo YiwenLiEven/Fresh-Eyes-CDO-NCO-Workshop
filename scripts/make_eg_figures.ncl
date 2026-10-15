@@ -14,15 +14,20 @@ begin
   ; Figure 1: Robinson map, fixed -0.2 to 0.4 degC range as in EG's revision.
   map_file = addfile(input_dir + "/tas_mean_monthly_anomaly_1979_2014.nc", "r")
   field = map_file->tas_anom(0,:,:)
+  replace_ieeenan(field, 1.e20, 0)
+  field@_FillValue = 1.e20
   wmap = gsn_open_wks("png", output_dir + "/01_mean_anomaly_map")
   mr = True
   mr@gsnMaximize = True
   mr@gsnAddCyclic = True
   mr@mpProjection = "Robinson"
   mr@mpCenterLonF = 0.0
+  mr@mpShapeMode = "FreeAspect"
+  mr@mpPerimOn = False
   mr@mpFillOn = False
   mr@mpOutlineOn = True
   mr@cnFillOn = True
+  mr@cnFillMode = "RasterFill"
   mr@cnFillPalette = "MPL_coolwarm"
   mr@cnLinesOn = False
   mr@cnLineLabelsOn = False
@@ -86,7 +91,7 @@ begin
   sr@tmYLBorderOn = False
   sr@tmYRBorderOn = False
   stripes = gsn_blank_plot(wstripe, sr)
-  polygons = new(stripe_count, graphic)
+  draw(stripes)
   pr = True
   pr@gsEdgesOn = False
   do i = 0, stripe_count-1
@@ -96,11 +101,12 @@ begin
     else
       pr@gsFillColor = (/1.0, 1.0-scaled, 1.0-scaled/)
     end if
-    xx = (/tofloat(i), tofloat(i+1), tofloat(i+1), tofloat(i)/)
-    yy = (/0.0, 0.0, 1.0, 1.0/)
-    polygons(i) = gsn_add_polygon(wstripe, stripes, xx, yy, pr)
+    left = 0.05 + 0.90*tofloat(i)/tofloat(stripe_count)
+    right = 0.05 + 0.90*tofloat(i+1)/tofloat(stripe_count)
+    xx = (/left, right, right, left, left/)
+    yy = (/0.35, 0.35, 0.70, 0.70, 0.35/)
+    gsn_polygon_ndc(wstripe, xx, yy, pr)
   end do
-  draw(stripes)
   frame(wstripe)
   print("NCL wrote all three EG figures to " + output_dir)
   print("Arctic annual stripes: " + stripe_count + " years; symmetric limit +/-" + limit + " degC")

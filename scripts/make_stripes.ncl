@@ -39,7 +39,7 @@ begin
   plot_resources@tiMainFontHeightF = 0.018
 
   plot = gsn_blank_plot(workstation, plot_resources)
-  polygons = new(count, graphic)
+  draw(plot)
   polygon_resources = True
   polygon_resources@gsEdgesOn = False
 
@@ -57,12 +57,12 @@ begin
     end if
     color_index = 2 + toint(fraction * tofloat(color_count - 1))
     polygon_resources@gsFillColor = color_index
-    x = (/tofloat(index), tofloat(index + 1), tofloat(index + 1), tofloat(index)/)
-    y = (/0.0, 0.0, 1.0, 1.0/)
-    polygons(index) = gsn_add_polygon(workstation, plot, x, y, polygon_resources)
+    left = 0.05 + 0.90*tofloat(index)/tofloat(count)
+    right = 0.05 + 0.90*tofloat(index+1)/tofloat(count)
+    x = (/left, right, right, left, left/)
+    y = (/0.56, 0.56, 0.80, 0.80, 0.56/)
+    gsn_polygon_ndc(workstation, x, y, polygon_resources)
   end do
-
-  draw(plot)
   frame(workstation)
   print("NCL stripes written to " + output_base + ".png")
 end
