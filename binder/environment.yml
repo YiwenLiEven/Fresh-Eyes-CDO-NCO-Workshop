@@ -4,8 +4,7 @@ channels:
 dependencies:
   - python=3.11
   - cdo>=2.2,<3
-  - nco>=5,<6
-  - ncl=6.6.2
+  - nco>=5.1.9,<6
   - cftime>=1.6
   - ipykernel>=6.29
   - jupyterlab>=4.2,<5

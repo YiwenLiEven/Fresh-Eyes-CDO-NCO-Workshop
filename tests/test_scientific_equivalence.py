@@ -13,10 +13,8 @@ def test_all_workshop_comparisons_pass() -> None:
             check=True,
         )
     subprocess.run(["bash", "scripts/run_all.sh", str(data), "outputs/test"], check=True)
-    report = json.loads(Path("outputs/test/validation.json").read_text())
+    report = json.loads(Path("outputs/test/monthly/three_way_validation.json").read_text())
     assert report
     assert all(result["passed"] for result in report.values())
-    monthly = json.loads(Path("outputs/test/monthly_validation.json").read_text())
-    assert len(monthly) == 4
-    assert all(result["passed"] for result in monthly.values())
+    assert len(report) == 8
 

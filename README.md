@@ -1,23 +1,48 @@
-# Binder environment
+# Fresh Eyes: Python vs CDO-only vs NCO-only
 
-The current seminar environment uses conda-forge for Python, CDO and NCO. NCL is optional legacy material and is not required by the current notebooks. NCO must be version 5.1.9 or later for the grouped annual-average operation.
+[Launch the seminar in Binder](https://mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/main?urlpath=lab/tree/notebooks/00_yl_20_minute_binder_demo.ipynb)
 
-## Build and checks
+**Verification status (3 November 2026):** this revision passed eight
+comparisons, two tests and execution of both seminar notebooks in an existing
+Binder Linux session (CDO 2.5.0, NCO 5.3.4, Python 3.11.14). See
+docs/independent_verification.json. The revised conda environment still needs
+a fresh image build. The recorded verification used an existing Binder Linux
+session with this revision's scripts and both current notebooks uploaded.
 
-`environment.yml` installs the scientific tools and JupyterLab. `postBuild` installs this repository, generates the synthetic dataset, runs Python, CDO-only and NCO-only workflows, checks eight independent comparisons, creates the common Python comparison figure, and executes both seminar and hands-on notebooks.
+## Current seminar workflow
 
-A successful build writes `outputs/verification.json` containing tool/package versions, eight numerical comparisons and notebook execution status. Executed copies are in `outputs/executed/`. The result figure is `outputs/demo/monthly/three_way_comparison.png` and the detailed checks are in `outputs/demo/monthly/three_way_validation.json`.
+Three independent implementations start from the same raw Kelvin NetCDF:
 
-The solver ranges are a compatible specification, not a complete lock file. Record the tested versions and freeze a Git revision before the seminar.
+| Route | Complete processing implementation | Final visualization |
+|---|---|---|
+| Python reference | xarray | Python/matplotlib |
+| CDO-only | CDO, no NCO commands | Python/matplotlib |
+| NCO-only | NCO, no CDO commands | Python/matplotlib |
 
-## Launch
+All routes reproduce EG's monthly climatology (1981-2010), monthly anomalies (1979-2014), mean anomaly map, arithmetic Arctic mean (65-90N), and equal-month annual stripes. Each has its own output directory. Python validates eight comparisons: four CDO products against Python, and four NCO products against Python. CDO explicitly uses fldmean,weights=false. Bare fldmean and fldavg use area weights and would change the shared definition.
 
-[Launch YL's notebook](https://mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/main?urlpath=lab/tree/notebooks/00_yl_20_minute_binder_demo.ipynb)
+### Start
 
-For a final seminar invitation, replace `main` with the successfully tested commit SHA. JupyterLab opens the notebook directly through `urlpath=lab/tree/...`.
+Open notebooks/00_yl_20_minute_binder_demo.ipynb and run all cells. For practice open notebooks/04_monthly_anomaly_hands_on.ipynb.
 
-Default data are synthetic and explicitly labelled. The actual full-grid ACCESS-CM2 file must be the same across languages for comparisons with the other presenters. See the [source mapping](../docs/EG_SHARED_NOTEBOOK_MAPPING.md).
+The default input is deterministic **synthetic** teaching data, not ACCESS-CM2 output. Supply WORKSHOP_INPUT to use a real shared file that satisfies the documented input contract. Scripts require complete monthly Kelvin tas(time,lat,lon), a regular 0-360 longitude grid, no missing values, all of 1979-2014, and all of 1981-2010. The read-only input checker rejects unsupported inputs instead of silently treating them as equivalent.
 
-Binder sessions are temporary. Download changed notebooks and results before leaving.
+Run locally in the prepared Linux environment:
 
-Official configuration references: [repo2docker](https://repo2docker.readthedocs.io/en/stable/configuration/) and [Binder JupyterLab links](https://mybinder.readthedocs.io/en/latest/howto/user_interface.html).
+    python -m pip install -e .
+    python scripts/generate_demo_data.py
+    bash scripts/run_independent_workflows.sh
+
+Outputs: outputs/demo/monthly/{python,cdo,nco}, three_way_validation.json and three_way_comparison.png.
+
+Numerical agreement means absolute error <= 0.0003 degC (rtol=0), exact calendar/spatial alignment and matching masks. It does not mean byte-identical NetCDF files. Metadata and mid-month timestamps may differ while calendar-month labels agree.
+
+### Legacy material
+
+The previous combined CDO/NCO script, global annual examples, NCL figures and notebooks 00_opening_demo through 03_hands_on_exercises remain historical/optional examples. They are not the current three-route seminar. The old executed notebooks and verification report describe the old revision, not evidence for the new one. No claim of successful live Binder build is implied by this README; use the new build's verification report.
+
+### Attribution
+
+Original Python workshop: [abhnil/Fresh_Eyes_on_CMIP_Data_Workshop](https://github.com/abhnil/Fresh_Eyes_on_CMIP_Data_Workshop).
+Shared compressed reference: [egalytska/Fresh_eyes, stripes_EG.ipynb](https://github.com/egalytska/Fresh_eyes/blob/393cfcf876fa47c6c231c3be70dbd9f8552fe3a3/stripes_EG.ipynb).
+The independent command-line implementations, input contract, equivalence checks and shared Python comparison figure are workshop extensions. Original source audits remain in docs/ORIGINAL_WORKSHOP_MAPPING.md and docs/EG_SHARED_NOTEBOOK_MAPPING.md; their old combined-route descriptions are historical.

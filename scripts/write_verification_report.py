@@ -14,10 +14,10 @@ report = {
     "tools": {},
     "shared_reference_commit": "393cfcf876fa47c6c231c3be70dbd9f8552fe3a3",
 }
-for tool, args in {"cdo": ["-V"], "ncks": ["--version"], "ncl": ["-V"]}.items():
+for tool, args in {"cdo": ["-V"], "ncks": ["--version"]}.items():
     result = subprocess.run([tool, *args], check=True, text=True, capture_output=True)
     report["tools"][tool] = (result.stdout + result.stderr).strip()
-report["monthly_validation"] = json.loads(Path("outputs/demo/monthly_validation.json").read_text())
+report["independent_workflow_validation"] = json.loads(Path("outputs/demo/monthly/three_way_validation.json").read_text())
 for name in ("00_yl_20_minute_binder_demo", "04_monthly_anomaly_hands_on"):
     notebook = json.loads(Path(f"outputs/executed/{name}.ipynb").read_text())
     assert not any(out.get("output_type") == "error" for cell in notebook["cells"] for out in cell.get("outputs", []))
