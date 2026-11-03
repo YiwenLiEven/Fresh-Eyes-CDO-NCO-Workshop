@@ -1,0 +1,17 @@
+#!/bin/bash
+set -euo pipefail
+
+python -m pip install --no-deps -e .
+python scripts/generate_demo_data.py --output data/demo/tas_demo.nc
+bash scripts/run_all.sh data/demo/tas_demo.nc outputs/demo
+python -m pytest -q
+mkdir -p outputs/executed
+jupyter nbconvert --to notebook --execute \
+  notebooks/00_yl_20_minute_binder_demo.ipynb \
+  --output-dir outputs/executed --ExecutePreprocessor.timeout=600
+jupyter nbconvert --to notebook --execute \
+  notebooks/04_monthly_anomaly_hands_on.ipynb \
+  --output-dir outputs/executed --ExecutePreprocessor.timeout=600
+python scripts/write_verification_report.py
+
+echo "Binder workshop environment is ready."

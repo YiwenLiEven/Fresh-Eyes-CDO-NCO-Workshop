@@ -1,0 +1,58 @@
+{
+  "completed_utc": "2026-11-03T05:47:52.500497+00:00",
+  "python": "3.11.14",
+  "packages": {
+    "xarray": "2026.9.0",
+    "numpy": "2.4.6",
+    "netCDF4": "1.7.2",
+    "nbconvert": "7.17.2"
+  },
+  "tools": {
+    "cdo": "Climate Data Operators version 2.5.0 (https://mpimet.mpg.de/cdo)\nSystem: x86_64-conda-linux-gnu\nCXX Compiler: /home/conda/feedstock_root/build_artifacts/cdo_1756129793720/_build_env/bin/x86_64-conda-linux-gnu-c++ -std=gnu++20 -fPIC -DPIC -g -O2 -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /srv/conda/envs/notebook/include -fdebug-prefix-map=/home/conda/feedstock_root/build_artifacts/cdo_1756129793720/work=/usr/local/src/conda/cdo-2.5.0 -fdebug-prefix-map=/srv/conda/envs/notebook=/usr/local/src/conda-prefix -fopenmp -pthread\nCXX version : x86_64-conda-linux-gnu-c++ (conda-forge gcc 14.3.0-4) 14.3.0\nCXX library :\nC Compiler: /home/conda/feedstock_root/build_artifacts/cdo_1756129793720/_build_env/bin/x86_64-conda-linux-gnu-cc -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /srv/conda/envs/notebook/include -fdebug-prefix-map=/home/conda/feedstock_root/build_artifacts/cdo_1756129793720/work=/usr/local/src/conda/cdo-2.5.0 -fdebug-prefix-map=/srv/conda/envs/notebook=/usr/local/src/conda-prefix -fopenmp -pthread -pthread\nC version : x86_64-conda-linux-gnu-cc (conda-forge gcc 14.3.0-4) 14.3.0\nF77 Compiler: /home/conda/feedstock_root/build_artifacts/cdo_1756129793720/_build_env/bin/x86_64-conda-linux-gnu-gfortran -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /srv/conda/envs/notebook/include -I/home/conda/feedstock_root/build_artifacts/cdo_1756129793720/_build_env/include -fdebug-prefix-map=/home/conda/feedstock_root/build_artifacts/cdo_1756129793720/work=/usr/local/src/conda/cdo-2.5.0 -fdebug-prefix-map=/srv/conda/envs/notebook=/usr/local/src/conda-prefix\nF77 version : GNU Fortran (conda-forge gcc 14.3.0-4) 14.3.0\nFeatures: 184GB 48threads c++20 OpenMP45 Fortran pthreads HDF5 NC4/HDF5/threadsafe OPeNDAP udunits2 proj xml2 magics curl fftw3 sse3\nLibraries: yac/3.1.0 NetCDF/4.9.2 HDF5/1.14.6 proj/9.6.2 xml2/2.13.8 curl/8.18.0(h8.14.1) magics/4.16.0\nCDI data types: SizeType=size_t\nCDI file types: srv ext ieg grb1 grb2 nc1 nc2 nc4 nc4c nc5 nczarr \n     CDI library version : 2.5.0\n cgribex library version : 2.3.1\n ecCodes library version : 2.42.0\n  NetCDF library version : 4.9.2 of Aug  1 2025 13:25:02 $\n    exse library version : 2.0.0\n    FILE library version : 1.9.1",
+    "ncks": "NCO netCDF Operators version 5.3.4 \"Fourth Place Fourth Time\" built by nobody on a4345237d7e5 at Jun 17 2025 06:20:35\nncks version 5.3.4"
+  },
+  "shared_reference_commit": "393cfcf876fa47c6c231c3be70dbd9f8552fe3a3",
+  "independent_workflow_validation": {
+    "cdo_vs_python/monthly": {
+      "max_absolute_difference_degC": 8.138020831438553e-06,
+      "absolute_tolerance_degC": 0.0003,
+      "passed": true
+    },
+    "nco_vs_python/monthly": {
+      "max_absolute_difference_degC": 8.138020831438553e-06,
+      "absolute_tolerance_degC": 0.0003,
+      "passed": true
+    },
+    "cdo_vs_python/map": {
+      "max_absolute_difference_degC": 1.9596406702106217e-06,
+      "absolute_tolerance_degC": 0.0003,
+      "passed": true
+    },
+    "nco_vs_python/map": {
+      "max_absolute_difference_degC": 1.9596406702106217e-06,
+      "absolute_tolerance_degC": 0.0003,
+      "passed": true
+    },
+    "cdo_vs_python/arctic_monthly": {
+      "max_absolute_difference_degC": 3.659062913774491e-07,
+      "absolute_tolerance_degC": 0.0003,
+      "passed": true
+    },
+    "nco_vs_python/arctic_monthly": {
+      "max_absolute_difference_degC": 3.659062913774491e-07,
+      "absolute_tolerance_degC": 0.0003,
+      "passed": true
+    },
+    "cdo_vs_python/arctic_annual": {
+      "max_absolute_difference_degC": 3.781583565731772e-08,
+      "absolute_tolerance_degC": 0.0003,
+      "passed": true
+    },
+    "nco_vs_python/arctic_annual": {
+      "max_absolute_difference_degC": 3.781583565731772e-08,
+      "absolute_tolerance_degC": 0.0003,
+      "passed": true
+    }
+  },
+  "notebooks_executed": true
+}
