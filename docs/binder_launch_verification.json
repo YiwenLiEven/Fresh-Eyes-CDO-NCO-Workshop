@@ -1,0 +1,96 @@
+{
+  "started_utc": "2026-11-03T09:18:13.292408+00:00",
+  "finished_utc": "2026-11-03T09:25:06.821144+00:00",
+  "repository": "YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop",
+  "ref": "ea6af63d118797569d8068baab669281aaa2d137",
+  "launch_url": "https://mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/ea6af63d118797569d8068baab669281aaa2d137?urlpath=lab/tree/notebooks/00_yl_20_minute_binder_demo.ipynb",
+  "mode": "read_only_inspection_of_published_image",
+  "image_build_observed": true,
+  "server_ready": true,
+  "result": "passed",
+  "comparison_count": 8,
+  "all_comparisons_passed": true,
+  "max_absolute_difference_degC": 8.138020831438553e-06,
+  "build_completed_utc": "2026-11-03T09:19:44.694751+00:00",
+  "python": "3.11.18",
+  "notebooks": {
+    "00_yl_20_minute_binder_demo.ipynb": {
+      "source": {
+        "code_cells": 6,
+        "nonempty_code_cells": 6,
+        "executed_code_cells": 0,
+        "error_outputs": 0
+      },
+      "executed": {
+        "code_cells": 6,
+        "nonempty_code_cells": 6,
+        "executed_code_cells": 6,
+        "error_outputs": 0
+      },
+      "jupyterlab_http_status": 200
+    },
+    "04_monthly_anomaly_hands_on.ipynb": {
+      "source": {
+        "code_cells": 6,
+        "nonempty_code_cells": 6,
+        "executed_code_cells": 0,
+        "error_outputs": 0
+      },
+      "executed": {
+        "code_cells": 6,
+        "nonempty_code_cells": 6,
+        "executed_code_cells": 6,
+        "error_outputs": 0
+      },
+      "jupyterlab_http_status": 200
+    }
+  },
+  "data": "Deterministic synthetic teaching dataset; not actual ACCESS-CM2 output.",
+  "ci_run": "https://github.com/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/actions/runs/41609810743",
+  "tool_versions": {
+    "cdo": "Climate Data Operators version 2.6.5 (https://mpimet.mpg.de/cdo)",
+    "ncks": "NCO netCDF Operators version 5.4.1 \"Granddude\" built by rattler on 7f5397f6c61d at Oct 30 2026 10:32:02"
+  },
+  "comparisons": {
+    "cdo_vs_python/monthly": {
+      "max_absolute_difference_degC": 8.138020831438553e-06,
+      "absolute_tolerance_degC": 0.0003,
+      "passed": true
+    },
+    "nco_vs_python/monthly": {
+      "max_absolute_difference_degC": 8.138020831438553e-06,
+      "absolute_tolerance_degC": 0.0003,
+      "passed": true
+    },
+    "cdo_vs_python/map": {
+      "max_absolute_difference_degC": 1.9596406702106217e-06,
+      "absolute_tolerance_degC": 0.0003,
+      "passed": true
+    },
+    "nco_vs_python/map": {
+      "max_absolute_difference_degC": 1.9596406702106217e-06,
+      "absolute_tolerance_degC": 0.0003,
+      "passed": true
+    },
+    "cdo_vs_python/arctic_monthly": {
+      "max_absolute_difference_degC": 3.659062913774491e-07,
+      "absolute_tolerance_degC": 0.0003,
+      "passed": true
+    },
+    "nco_vs_python/arctic_monthly": {
+      "max_absolute_difference_degC": 3.659062913774491e-07,
+      "absolute_tolerance_degC": 0.0003,
+      "passed": true
+    },
+    "cdo_vs_python/arctic_annual": {
+      "max_absolute_difference_degC": 3.781583565731772e-08,
+      "absolute_tolerance_degC": 0.0003,
+      "passed": true
+    },
+    "nco_vs_python/arctic_annual": {
+      "max_absolute_difference_degC": 3.781583565731772e-08,
+      "absolute_tolerance_degC": 0.0003,
+      "passed": true
+    }
+  }
+}

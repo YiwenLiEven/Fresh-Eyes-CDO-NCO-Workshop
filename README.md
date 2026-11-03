@@ -1,13 +1,10 @@
 # Fresh Eyes: Python vs CDO-only vs NCO-only
 
-[Launch the seminar in Binder](https://mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/main?urlpath=lab/tree/notebooks/00_yl_20_minute_binder_demo.ipynb)
+[Launch the seminar in Binder](https://mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/ea6af63d118797569d8068baab669281aaa2d137?urlpath=lab/tree/notebooks/00_yl_20_minute_binder_demo.ipynb)
 
-**Verification status (3 November 2026):** this revision passed eight
-comparisons, two tests and execution of both seminar notebooks in an existing
-Binder Linux session (CDO 2.5.0, NCO 5.3.4, Python 3.11.14). See
-docs/independent_verification.json. The revised conda environment still needs
-a fresh image build. The recorded verification used an existing Binder Linux
-session with this revision's scripts and both current notebooks uploaded.
+[Open the participant hands-on notebook](https://mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/ea6af63d118797569d8068baab669281aaa2d137?urlpath=lab/tree/notebooks/04_monthly_anomaly_hands_on.ipynb) · [Download the presentation](slides/CDO_NCO_Hands_On_Comparison_YL_2026_Final.pptx)
+
+**Verified on 3 November 2026:** the pinned revision `ea6af63` built successfully on public Binder, opened JupyterLab, and passed all eight CDO/Python and NCO/Python comparisons. Both seminar notebooks executed without errors; both tests passed during the build. The largest numerical difference was 8.14e-06 degC (tolerance 0.0003 degC). See [Binder verification](docs/binder_launch_verification.json) and [the successful GitHub Actions run](https://github.com/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/actions/runs/41609810743). The launch links above use that tested commit.
 
 ## Current seminar workflow
 
@@ -39,7 +36,7 @@ Numerical agreement means absolute error <= 0.0003 degC (rtol=0), exact calendar
 
 ### Legacy material
 
-The previous combined CDO/NCO script, global annual examples, NCL figures and notebooks 00_opening_demo through 03_hands_on_exercises remain historical/optional examples. They are not the current three-route seminar. The old executed notebooks and verification report describe the old revision, not evidence for the new one. No claim of successful live Binder build is implied by this README; use the new build's verification report.
+The previous combined CDO/NCO script, global annual examples, NCL figures and notebooks 00_opening_demo through 03_hands_on_exercises remain historical/optional examples. They are not the current three-route seminar. The old executed notebooks and verification report describe the old revision, not evidence for the new one. Use the pinned revision and current Binder verification linked above for the independent-workflow seminar.
 
 ### Attribution
 
