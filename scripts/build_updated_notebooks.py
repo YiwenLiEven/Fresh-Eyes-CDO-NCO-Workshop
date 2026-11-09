@@ -9,11 +9,13 @@ ROOT = Path(__file__).resolve().parents[1]
 N = ROOT / 'notebooks'
 
 def md(s): return nbf.v4.new_markdown_cell(s.strip())
-def code(s, backstage=False):
+def code(s, backstage=False, tags=None):
     cell = nbf.v4.new_code_cell(s.strip())
     if backstage:
         cell.metadata['jupyter'] = {'source_hidden': True}
         cell.metadata['tags'] = ['infrastructure']
+    if tags:
+        cell.metadata.setdefault('tags', []).extend(tags)
     return cell
 
 def save(name, cells):
@@ -34,25 +36,26 @@ def save(name, cells):
 
 setup = '''# Select the data and create this run
 from pathlib import Path
-import os, sys, subprocess, json, uuid
+import os, sys, subprocess, json, uuid, shlex
 from datetime import datetime, timezone
 from IPython.display import display, Image
 
-ROOT = Path.cwd().resolve()
-if not (ROOT / "scripts/run_python_updated.py").exists():
-    ROOT = ROOT.parent
-assert (ROOT / "scripts/run_python_updated.py").exists(), "Open this notebook from the workshop repository."
+ROOT = next((p for p in (Path.cwd().resolve(), *Path.cwd().resolve().parents)
+             if (p / "scripts/run_python_updated.py").is_file()), None)
+assert ROOT is not None, "Open this notebook from the workshop repository."
 os.chdir(ROOT)
 
 # The seminar uses real ACCESS-CM2. Synthetic mode is an explicit software-test option.
 DATA_MODE = os.environ.get("WORKSHOP_MODE", "real")  # "real" or "synthetic"
-END_YEAR = int(os.environ.get("WORKSHOP_END_YEAR", "2024"))
+END_YEAR = 2024
+if os.environ.get("WORKSHOP_END_YEAR", "2024") != "2024":
+    raise ValueError("This command-by-command lesson uses explicit 1979–2024 dates. Use Run_Updated_Demo.command --end-year 2100 for the extended batch calculation.")
 assert DATA_MODE in {"synthetic", "real"}
 assert END_YEAR >= 2024
 os.environ["OMP_NUM_THREADS"] = "1"
 if DATA_MODE == "synthetic":
     fixture = ROOT / "data/updated_fixture"
-    subprocess.run([sys.executable, "scripts/generate_updated_fixture.py", str(fixture)], check=True)
+    subprocess.run([sys.executable, str(ROOT / "scripts/generate_updated_fixture.py"), str(fixture)], check=True)
     HIST, FUTURE = fixture / "historical.nc", fixture / "ssp585.nc"
 else:
     directory = ROOT / "data/access_cm2"
@@ -62,20 +65,29 @@ else:
     if missing:
         raise FileNotFoundError("Real-data mode requires both raw files. No synthetic substitution is allowed. Missing: " + "; ".join(missing) + ". See docs/UPDATED_DEMO.md.")
 
+HIST, FUTURE = HIST.resolve(), FUTURE.resolve()
 RUN = ROOT / "outputs" / ("updated_" + DATA_MODE + "_" + datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S") + "_" + uuid.uuid4().hex[:6])
 RUN.mkdir(parents=True)
-for route in ("cdo", "nco"):
-    directory = RUN / route
-    (directory / "work").mkdir(parents=True)
-    (directory / "historical_input.nc").symlink_to(HIST.resolve())
-    (directory / "ssp585_input.nc").symlink_to(FUTURE.resolve())
-os.environ.update(DEMO_HIST=os.path.relpath(HIST, ROOT), DEMO_FUTURE=os.path.relpath(FUTURE, ROOT), DEMO_OUT=os.path.relpath(RUN, ROOT), DEMO_END=str(END_YEAR))
+for directory in ("data", "cdo", "nco", "exercises"):
+    (RUN / directory).mkdir()
+(RUN / "data/historical.nc").symlink_to(HIST.resolve())
+(RUN / "data/ssp585.nc").symlink_to(FUTURE.resolve())
+os.chdir(RUN)
+
+# Execute each visible ! command directly; no shell expansion or script wrapper.
+# A failed command raises an exception, so Run All cannot silently continue.
+def run_command(command):
+    result = subprocess.run(shlex.split(command), stdin=subprocess.DEVNULL,
+                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    print(result.stdout, end="")
+    result.check_returncode()
+get_ipython().system = run_command
 print("DATA MODE:", "SYNTHETIC SOFTWARE TEST — NOT ACCESS-CM2" if DATA_MODE == "synthetic" else "REAL ACCESS-CM2: historical + SSP5-8.5")
 print("Analysis:", f"1979–{END_YEAR}", "| Monthly reference: 1981–2010")
 print("Outputs:", RUN.relative_to(ROOT))
 '''
 check = '''# Check data coverage and tool versions
-_ = subprocess.run([sys.executable, "scripts/check_updated_inputs.py", str(HIST), str(FUTURE), "--end-year", str(END_YEAR)], check=True)
+_ = subprocess.run([sys.executable, str(ROOT / "scripts/check_updated_inputs.py"), str(HIST), str(FUTURE), "--end-year", str(END_YEAR)], check=True)
 for command in (["cdo", "-V"], ["ncks", "--version"]):
     result = subprocess.run(command, check=True, text=True, capture_output=True)
     print((result.stdout + result.stderr).splitlines()[0])
@@ -98,7 +110,7 @@ each month equal weight. Keeping these definitions the same across tools makes
 the numerical comparison meaningful.
 '''
 validate='''# Compare the three results
-subprocess.run([sys.executable, "scripts/compare_updated_workflows.py", str(RUN)], check=True)
+subprocess.run([sys.executable, str(ROOT / "scripts/compare_updated_workflows.py"), str(RUN)], check=True)
 report = json.loads((RUN / "updated_validation.json").read_text())
 assert report["passed"]
 print("Maximum absolute difference (°C):", max(row["max_absolute_difference_degC"] for row in report["comparisons"].values()))
@@ -108,27 +120,34 @@ display(Image(filename=str(RUN / "updated_comparison.png")))'''
 
 
 python_reference = '''# Calculate the independent reference
-_ = subprocess.run([sys.executable, "scripts/run_python_updated.py", str(HIST), str(FUTURE), str(RUN / "python"), "--end-year", str(END_YEAR)], check=True, capture_output=True, text=True)
+_ = subprocess.run([sys.executable, str(ROOT / "scripts/run_python_updated.py"), str(HIST), str(FUTURE), str(RUN / "python"), "--end-year", str(END_YEAR)], check=True, capture_output=True, text=True)
 print(f"Reference ready: five products for 1979–{END_YEAR}.")
 '''
 
 def command_cells(route, steps, section):
     cells = []
-    for number, (title, explanation, commands) in enumerate(steps, 1):
+    for number, (title, explanation, command, inspection) in enumerate(steps, 1):
+        assert "\n" not in command and "\n" not in inspection
+        assert "$" not in command and "$" not in inspection
         cells.append(md(f"### {section}.{number:02d} · {title}\n\n{explanation}"))
-        cells.append(code(f'%%bash -e\ncd "$DEMO_OUT/{route}"\n\n{commands.strip()}'))
+        cells.append(code("!" + command, tags=[f"{route}-processing"]))
+        cells.append(md("**Inspect the result**"))
+        cells.append(code("!" + inspection, tags=[f"{route}-inspection"]))
     return cells
 
-shell_intro = '''Each cell below contains the commands it executes. Use **Shift+Enter** to run
-one cell and inspect its result before continuing.
+command_intro = '''Run **one command**, then run the next cell to **inspect its result**.
+Read the output before moving on. Use **Shift+Enter** for each cell.
 
-- `%%bash -e` runs shell commands and stops the cell if a command fails.
-- `cd "$DEMO_OUT/cdo"` or `cd "$DEMO_OUT/nco"` enters that route's result folder.
-- `historical_input.nc` and `ssp585_input.nc` are short names for the two original files.
-- `$DEMO_END` is 2024; it can be changed for the optional extension.
+The leading `!` runs a command in this notebook. The command itself is the same
+CDO or NCO command you would type in a terminal; omit `!` there.
 
-To repeat the calculation, run from the first cell again to create a new results
-folder. The commands write new files without overwrite options.
+- `data/historical.nc` and `data/ssp585.nc` are the two input files.
+- `cdo/` and `nco/` hold the files created by each tool.
+- Dates and filenames are written directly in every command.
+
+All commands run in the results directory printed in the Data section.
+To repeat the calculation, start again from the first cell to create a new
+results directory. Previous results are retained.
 '''
 
 seminar=[
@@ -169,7 +188,7 @@ md('''## 04 · CDO: from monthly temperature to annual stripes
 CDO operators describe the operation applied to a NetCDF file. Most steps below
 write one new file, which becomes the input to the next step:
 `cdo operation input.nc output.nc`.
-'''),md(shell_intro),
+'''),md(command_intro),
 *command_cells('cdo', CDO_STEPS, '04'),
 md('''## 05 · NCO: the same calculation from the original data
 
@@ -197,7 +216,7 @@ Evgenia's saved ESMValTool outputs is a separate check.
 md('''## 08 · Try a different region or period
 
 Open [04_monthly_anomaly_hands_on.ipynb](04_monthly_anomaly_hands_on.ipynb).
-Change the Arctic boundary, annual time weights or scenario end year, one at a time.
+Change the Arctic boundary or annual time weights, one at a time.
 
 Each run folder contains NetCDF outputs, `updated_validation.json` and
 `updated_comparison.png`. Download your results and edited notebook before
@@ -218,24 +237,27 @@ md('''## 1 · Reproduce the common result
 
 Keep the baseline, region and time weights fixed for the first calculation.
 The independent reference and both command-line routes start from the raw data.
-'''),code(python_reference, backstage=True),md(shell_intro),
+'''),code(python_reference, backstage=True),md(command_intro),
 md('## 1A · CDO'),*command_cells('cdo', CDO_STEPS, '1A'),
 md('## 1B · NCO'),*command_cells('nco', NCO_STEPS, '1B'),
 md('## 1C · Compare the three routes'),code(validate, backstage=True),code(figure, backstage=True),
 md('''## 2 · Move the Arctic boundary to 70°N
 
-Prediction: should narrowing the region change the annual anomaly? The answer
-depends on the spatial structure of the data. These commands use each route's
-own anomaly file. They retain equal grid-point weights and equal monthly weights.
-Only the latitude threshold changes.
-'''),code('''%%bash -e
-mkdir -p "$DEMO_OUT/exercises"
-cdo sellonlatbox,0,360,70,90 \
-  "$DEMO_OUT/cdo/anomaly.nc" "$DEMO_OUT/exercises/cdo_arctic_70N.nc"
-cdo fldmean,weights=false \
-  "$DEMO_OUT/exercises/cdo_arctic_70N.nc" "$DEMO_OUT/exercises/cdo_monthly_70N.nc"
-ncwa -a lat,lon -d lat,70.0,90.0 \
-  "$DEMO_OUT/nco/anomaly.nc" "$DEMO_OUT/exercises/nco_monthly_70N.nc"'''),code('''import numpy as np
+Change one scientific choice: the latitude threshold. Keep equal grid-point
+weights and equal monthly weights. Compare the first monthly value as well as
+the full series.'''),
+*command_cells('exercise', [
+    ('Select 70–90°N with CDO', 'Select a smaller Arctic region. Inspect the number of retained grid points.',
+     'cdo sellonlatbox,0,360,70,90 cdo/anomaly.nc exercises/cdo_arctic_70N.nc',
+     'cdo ngridpoints exercises/cdo_arctic_70N.nc'),
+    ('Average that region with CDO', 'Each selected grid point has equal weight. Inspect the first monthly anomaly.',
+     'cdo fldmean,weights=false exercises/cdo_arctic_70N.nc exercises/cdo_monthly_70N.nc',
+     'cdo outputtab,date,value -seltimestep,1 exercises/cdo_monthly_70N.nc'),
+    ('Average the same region with NCO', 'Select 70–90°N and average latitude and longitude. Compare the first value with CDO.',
+     'ncwa -a lat,lon -d lat,70.0,90.0 nco/anomaly.nc exercises/nco_monthly_70N.nc',
+     'ncks -H -C -v tas_anom -d time,0,0 exercises/nco_monthly_70N.nc'),
+], '2'),
+code('''import numpy as np
 import xarray as xr
 with xr.open_dataset(RUN / "exercises/cdo_monthly_70N.nc") as a, xr.open_dataset(RUN / "exercises/nco_monthly_70N.nc") as b:
     cdo70 = a.tas_anom.values.squeeze()
@@ -247,39 +269,43 @@ with xr.open_dataset(RUN / "cdo/arctic_monthly.nc") as original:
 md('''## 3 · Change the annual time weights only
 
 `yearmean` gives equal weight to each monthly sample. `yearmonmean` weights
-monthly values by the number of days in each month. The latter is a valid
-alternative question, but it changes the annual definition in the shared recipe.
-Keep the Arctic boundary at 65°N while testing this difference.
-'''),code('''%%bash -e
-cdo yearmonmean "$DEMO_OUT/cdo/arctic_monthly.nc" \
-  "$DEMO_OUT/exercises/cdo_annual_monthlength.nc"'''),code('''with xr.open_dataset(RUN / "exercises/cdo_annual_monthlength.nc") as weighted, xr.open_dataset(RUN / "cdo/arctic_annual.nc") as equal:
+monthly values by the number of days in each month. Keep the Arctic boundary
+at 65°N while testing this difference.'''),
+*command_cells('exercise', [
+    ('Weight the months by their lengths', 'Inspect the first annual value, then compare the whole series below.',
+     'cdo yearmonmean cdo/arctic_monthly.nc exercises/cdo_annual_monthlength.nc',
+     'cdo outputtab,date,value -seltimestep,1 exercises/cdo_annual_monthlength.nc'),
+], '3'),
+code('''with xr.open_dataset(RUN / "exercises/cdo_annual_monthlength.nc") as weighted, xr.open_dataset(RUN / "cdo/arctic_annual.nc") as equal:
     difference = weighted.tas_anom.values.squeeze() - equal.tas_anom.values.squeeze()
     print("Annual month-length weighting minus equal-month weighting:")
     print("Maximum absolute change:", float(abs(difference).max()), "°C")
 print("The shared recipe's annual result remains the original equal-month product.")''', backstage=True),
-md('''## 4 · Check the reference period residual
+md('''## 4 · Check the reference-period residual
 
-For each grid point and calendar month, the average anomaly over 1981–2010
-should be close to zero. This checks the month matching, not whether all
-1979–2024 anomalies average to zero.
-'''),code('''%%bash -e
-cdo selyear,1981/2010 "$DEMO_OUT/cdo/anomaly.nc" \
-  "$DEMO_OUT/exercises/baseline_anomaly.nc"
-cdo ymonmean "$DEMO_OUT/exercises/baseline_anomaly.nc" \
-  "$DEMO_OUT/exercises/baseline_residual.nc"'''),code('''with xr.open_dataset(RUN / "exercises/baseline_residual.nc") as residual:
+For each grid point and calendar month, the mean anomaly over 1981–2010
+should be close to zero.'''),
+*command_cells('exercise', [
+    ('Select reference-period anomalies', 'Inspect the record count: the 30-year period contains 360 months.',
+     'cdo selyear,1981/2010 cdo/anomaly.nc exercises/baseline_anomaly.nc',
+     'cdo ntime exercises/baseline_anomaly.nc'),
+    ('Average each calendar month', 'Inspect the largest absolute residual on the grid for each of the 12 months. All should be close to zero.',
+     'cdo ymonmean exercises/baseline_anomaly.nc exercises/baseline_residual.nc',
+     'cdo output -fldmax -abs exercises/baseline_residual.nc'),
+], '4'),
+code('''with xr.open_dataset(RUN / "exercises/baseline_residual.nc") as residual:
     maximum = float(abs(residual.tas_anom).max())
     assert maximum <= 0.0003
     print("PASS: maximum reference-period monthly residual =", maximum, "°C")''', backstage=True),
-md('''## Optional extension · Continue the scenario to 2100
+md('''## Keep exploring
 
-Change `WORKSHOP_END_YEAR` (or `END_YEAR` in the setup cell) to `2100`, restart,
-and run all cells. Use the same historical 1981–2010 reference, and retain
-explicit historical/SSP5-8.5 labeling. This produces 122 annual values, 1979–2100.
-It is an extension of the seminar calculation; do not compare its period-mean
-map directly with the 1979–2024 reference map as if the definitions were equal.
+These commands use explicit dates and indices for 1979–2024. When changing a
+time period, update all related selections and sample counts consistently.
+The two exercises above change one choice at a time while keeping those dates
+fixed.
 
 Save your edited notebook, NetCDF outputs, validation report and figures before
 closing a Binder session. All outputs from this run are under the printed path.
 ''')]
 save('04_monthly_anomaly_hands_on.ipynb',practice)
-print('Wrote two notebooks with inline CDO/NCO commands.')
+print('Wrote two command-and-result notebooks.')

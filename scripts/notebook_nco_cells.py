@@ -1,177 +1,226 @@
-"""Literal NCO commands and explanations used by the notebook builder."""
+"""Direct NCO notebook commands and compact result queries for 1979–2024."""
 
 NCO_STEPS = [
     (
-        'Select the historical and scenario months',
-        '''`ncks` extracts `tas` and its time bounds from each raw input. The
-historical selection contains **432 months, 1979–2014**. For an end year of
-2024, the SSP5-8.5 selection contains **120 months, 2015–2024**.
-
-`-v` selects variables; `-d time,start,end` selects dates. `--mk_rec_dmn time`
-makes time the record dimension needed by `ncrcat`. The first `-3` selects
-classic NetCDF; the merged file and later outputs inherit that format. The
-outputs are `work/historical.nc` and `work/ssp585.nc`.''',
-        r'''ncks -3 --mk_rec_dmn time -v tas,time_bnds \
-  -d time,'1979-01-01','2014-12-31' \
-  historical_input.nc work/historical.nc
-
-ncks --mk_rec_dmn time -v tas,time_bnds \
-  -d time,'2015-01-01',"$DEMO_END-12-31" \
-  ssp585_input.nc work/ssp585.nc''',
+        'Select historical months',
+        'Select tas and time bounds for January 1979–December 2014. -v selects variables; -d selects dates; --mk_rec_dmn makes time a record dimension for concatenation. -3 chooses classic NetCDF once; later files inherit it. The metadata shows 432 monthly records.',
+        'ncks -3 --mk_rec_dmn time -v tas,time_bnds -d time,1979-01-01,2014-12-31 data/historical.nc nco/historical.nc',
+        'ncks -m -C -v tas nco/historical.nc',
     ),
     (
-        'Join the two experiments',
-        '''`ncrcat` concatenates records in the supplied order: historical
-first, then SSP5-8.5. `work/merged.nc` contains **552 consecutive monthly fields
-for 1979–2024**. No averaging occurs in this step.''',
-        r'''ncrcat work/historical.nc work/ssp585.nc work/merged.nc''',
+        'Select SSP5-8.5 months',
+        'Select January 2015–December 2024 from the raw SSP5-8.5 file. The result contains 120 monthly records on the same grid.',
+        'ncks --mk_rec_dmn time -v tas,time_bnds -d time,2015-01-01,2024-12-31 data/ssp585.nc nco/ssp585.nc',
+        'ncks -m -C -v tas nco/ssp585.nc',
+    ),
+    (
+        'Join historical and SSP5-8.5',
+        'ncrcat joins the record dimensions in the listed order. No averaging occurs. The output contains 552 consecutive months, 1979–2024.',
+        'ncrcat nco/historical.nc nco/ssp585.nc nco/merged.nc',
+        'ncks -m -C -v tas nco/merged.nc',
     ),
     (
         'Convert Kelvin to Celsius',
-        '''`ncap2 -s` evaluates the visible arithmetic expression. `double(tas)`
-requests double precision, and subtracting **273.15** converts Kelvin to Celsius.
-The result is `work/celsius.nc` with the same monthly fields.
-
-`ncatted -a` edits attributes. The two missing-value attributes use the same
-double-precision value. The time bounds are complete, so their unused fill
-attribute is removed. The original `cell_measures` link refers to an external
-area file; it is removed because these spatial means use equal grid-point
-weights. These attribute edits do not change the valid temperature values.''',
-        r'''ncap2 -s '
-  tas=double(tas)-273.15;
-  tas@units="degC";
-' work/merged.nc work/celsius.nc
-
-ncatted \
-  -a _FillValue,tas,o,d,1.0e20 \
-  -a missing_value,tas,o,d,1.0e20 \
-  -a _FillValue,time_bnds,d,, \
-  -a cell_measures,tas,d,, \
-  work/celsius.nc''',
+        'ncap2 -s evaluates an arithmetic expression. double(tas) retains double precision; subtracting 273.15 converts Kelvin to Celsius. The query shows the first month at one grid point.',
+        'ncap2 -s \'tas=double(tas)-273.15;tas@units="degC";\' nco/merged.nc nco/celsius.nc',
+        'ncks -H -C -v tas -d time,0 -d lat,0 -d lon,0 nco/celsius.nc',
     ),
     (
-        'Select the 1981–2010 reference period',
-        '''The reference is taken from the historical years in
-`work/celsius.nc`. `work/baseline.nc` contains **360 consecutive months**,
-starting in January 1981 and ending in December 2010.''',
-        r'''ncks -d time,'1981-01-01','2010-12-31' \
-  work/celsius.nc work/baseline.nc''',
+        'Keep the temperature attributes consistent',
+        'ncatted -a edits attributes in place. The two missing-value attributes use the same double value. Remove the unused fill attribute from complete time bounds and the link to an unavailable external area file. These edits leave valid temperatures unchanged.',
+        'ncatted -a _FillValue,tas,o,d,1.0e20 -a missing_value,tas,o,d,1.0e20 -a _FillValue,time_bnds,d,, -a cell_measures,tas,d,, nco/celsius.nc',
+        'ncks -m -C -v tas nco/celsius.nc',
     ),
     (
-        'Calculate twelve monthly reference fields',
-        '''NCO indices start at **zero**. For January, `m=0` and
-`-d time,0,359,12` selects indices **0, 12, 24, …, 348**: the 30 Januaries.
-February starts at index 1; the loop continues through December at index 11.
-
-`ncwa -a time` takes an arithmetic mean and removes the time dimension.
-`ncecat -u month` joins the twelve fields in January-to-December order.
-`ncap2` adds month labels **1–12** and writes the final `climatology.nc`.
-`month_files` holds only the twelve filenames.''',
-        r'''month_files=()
-for m in {0..11}; do
-  printf -v tag '%02d' "$m"
-  ncwa -a time -d time,"$m",359,12 \
-    work/baseline.nc "work/clim_$tag.nc"
-  month_files+=("work/clim_$tag.nc")
-done
-
-ncecat -u month "${month_files[@]}" work/climatology_unlabelled.nc
-
-ncap2 -s '
-  month[month]=array(1,1,$month);
-  month@long_name="calendar month";
-' work/climatology_unlabelled.nc climatology.nc''',
+        'Select the reference period',
+        'Select the 360 monthly fields from January 1981 to December 2010. These records define twelve separate calendar-month reference fields.',
+        'ncks -d time,1981-01-01,2010-12-31 nco/celsius.nc nco/baseline.nc',
+        'ncks -m -C -v tas nco/baseline.nc',
     ),
     (
-        'Subtract the matching calendar-month reference',
-        '''Rename the reference temperature to `tas_clim`, fix its month
-dimension, and append it to the temperature file. A fixed month dimension
-allows the time dimension to remain the single record dimension in classic
-NetCDF.
-
-The input starts in January and contains consecutive complete months. Therefore
-`t%12` identifies the corresponding zero-based reference month for every time
-index `t`. `ncap2` subtracts that reference at every latitude and longitude.
-`anomaly.nc` retains **552 monthly anomaly fields** and their time bounds.''',
-        r'''ncrename -v tas,tas_clim climatology.nc work/clim_named.nc
-ncks --fix_rec_dmn month work/clim_named.nc work/clim_fixed.nc
-ncks -A -v tas_clim work/clim_fixed.nc work/celsius.nc
-
-ncap2 -s '
-  tas_anom=tas;
-  for(t=0;t<$time.size;t++){
-    tas_anom(t,:,:)=tas(t,:,:)-tas_clim(t%12,:,:);
-  }
-  tas_anom@units="degC";
-  tas_anom@anomaly_reference_period="1981-2010";
-' work/celsius.nc work/anomaly_all.nc
-
-ncks -v tas_anom,time_bnds work/anomaly_all.nc anomaly.nc''',
+        'Calculate the January reference',
+        'NCO indices start at zero. The slice time,0,359,12 selects indices 0, 12, 24, …, 348: the 30 January fields in 1981–2010. ncwa -a time takes their arithmetic mean and removes the time dimension. The query shows one grid-point value.',
+        'ncwa -a time -d time,0,359,12 nco/baseline.nc nco/clim_01.nc',
+        'ncks -H -C -v tas -d lat,0 -d lon,0 nco/clim_01.nc',
     ),
     (
-        'Calculate the duration-weighted mean anomaly map',
-        '''`time_bnds(:,1)-time_bnds(:,0)` gives each monthly interval's
-duration in the file's time units. `ncwa -a time -w duration` computes
-**Σ(anomaly × duration) / Σ(duration)** at each grid point.
-
-`map_mean.nc` contains one latitude–longitude field. The map follows the
-recipe's duration weighting and is a period-mean anomaly, not a trend.''',
-        r'''ncap2 -s '
-  duration[time]=double(time_bnds(:,1)-time_bnds(:,0));
-' anomaly.nc work/weighted.nc
-
-ncwa -a time -w duration -v tas_anom \
-  work/weighted.nc map_mean.nc''',
+        'Calculate the February reference',
+        'NCO indices start at zero. The slice time,1,359,12 selects indices 1, 13, 25, …, 349: the 30 February fields in 1981–2010. ncwa -a time takes their arithmetic mean and removes the time dimension. The query shows one grid-point value.',
+        'ncwa -a time -d time,1,359,12 nco/baseline.nc nco/clim_02.nc',
+        'ncks -H -C -v tas -d lat,0 -d lon,0 nco/clim_02.nc',
     ),
     (
-        'Average the Arctic grid points',
-        '''`-d lat,65.0,90.0` selects latitude centres from 65°N to 90°N.
-`ncwa -a lon` first takes the zonal mean; `ncwa -a lat` then takes the
-meridional mean. No area weights are supplied, matching the recipe's arithmetic
-spatial means.
-
-`arctic_monthly.nc` contains **552 monthly Arctic anomalies**.''',
-        r'''ncwa -a lon -d lat,65.0,90.0 \
-  anomaly.nc work/arctic_zonal.nc
-
-ncwa -a lat work/arctic_zonal.nc arctic_monthly.nc''',
+        'Calculate the March reference',
+        'NCO indices start at zero. The slice time,2,359,12 selects indices 2, 14, 26, …, 350: the 30 March fields in 1981–2010. ncwa -a time takes their arithmetic mean and removes the time dimension. The query shows one grid-point value.',
+        'ncwa -a time -d time,2,359,12 nco/baseline.nc nco/clim_03.nc',
+        'ncks -H -C -v tas -d lat,0 -d lon,0 nco/clim_03.nc',
     ),
     (
-        'Calculate annual Arctic anomalies',
-        '''`ncks --mk_rec_dmn time` prepares the monthly time series for
-record averaging. With `ncra --mro -d time,,,12,12`, the stride and averaging
-group both contain twelve records: January–December of each year.
-
-`arctic_annual.nc` contains **46 annual values, 1979–2024**. Each monthly sample
-has equal weight. This annual definition deliberately differs from the
-duration-weighted map.''',
-        r'''ncks --mk_rec_dmn time \
-  arctic_monthly.nc work/arctic_record.nc
-
-ncra --mro -d time,,,12,12 \
-  work/arctic_record.nc arctic_annual.nc''',
+        'Calculate the April reference',
+        'NCO indices start at zero. The slice time,3,359,12 selects indices 3, 15, 27, …, 351: the 30 April fields in 1981–2010. ncwa -a time takes their arithmetic mean and removes the time dimension. The query shows one grid-point value.',
+        'ncwa -a time -d time,3,359,12 nco/baseline.nc nco/clim_04.nc',
+        'ncks -H -C -v tas -d lat,0 -d lon,0 nco/clim_04.nc',
     ),
     (
-        'Set the annual time bounds',
-        '''`ncra` also averages the monthly bounds as ordinary variables.
-Replace those bounds with the start of January and the end of December for
-each year, leaving the annual anomaly values unchanged.
-
-The first selection takes records **0, 12, 24, …**; the second takes records
-**11, 23, 35, …**. `-C -v` copies only the named variable, so the annual time
-coordinate is preserved. The final file has **46 complete calendar-year
-intervals**.''',
-        r'''ncks -v time_bnds -d time,0,,12 \
-  work/arctic_record.nc work/year_starts.nc
-ncks -v time_bnds -d time,11,,12 \
-  work/arctic_record.nc work/year_ends.nc
-
-ncap2 -s 'year_end[time]=time_bnds(:,1);' \
-  work/year_ends.nc work/year_ends_named.nc
-ncks -A -C -v year_end work/year_ends_named.nc work/year_starts.nc
-
-ncap2 -s 'time_bnds(:,1)=year_end;' \
-  work/year_starts.nc work/year_bounds.nc
-ncks -A -C -v time_bnds work/year_bounds.nc arctic_annual.nc''',
+        'Calculate the May reference',
+        'NCO indices start at zero. The slice time,4,359,12 selects indices 4, 16, 28, …, 352: the 30 May fields in 1981–2010. ncwa -a time takes their arithmetic mean and removes the time dimension. The query shows one grid-point value.',
+        'ncwa -a time -d time,4,359,12 nco/baseline.nc nco/clim_05.nc',
+        'ncks -H -C -v tas -d lat,0 -d lon,0 nco/clim_05.nc',
+    ),
+    (
+        'Calculate the June reference',
+        'NCO indices start at zero. The slice time,5,359,12 selects indices 5, 17, 29, …, 353: the 30 June fields in 1981–2010. ncwa -a time takes their arithmetic mean and removes the time dimension. The query shows one grid-point value.',
+        'ncwa -a time -d time,5,359,12 nco/baseline.nc nco/clim_06.nc',
+        'ncks -H -C -v tas -d lat,0 -d lon,0 nco/clim_06.nc',
+    ),
+    (
+        'Calculate the July reference',
+        'NCO indices start at zero. The slice time,6,359,12 selects indices 6, 18, 30, …, 354: the 30 July fields in 1981–2010. ncwa -a time takes their arithmetic mean and removes the time dimension. The query shows one grid-point value.',
+        'ncwa -a time -d time,6,359,12 nco/baseline.nc nco/clim_07.nc',
+        'ncks -H -C -v tas -d lat,0 -d lon,0 nco/clim_07.nc',
+    ),
+    (
+        'Calculate the August reference',
+        'NCO indices start at zero. The slice time,7,359,12 selects indices 7, 19, 31, …, 355: the 30 August fields in 1981–2010. ncwa -a time takes their arithmetic mean and removes the time dimension. The query shows one grid-point value.',
+        'ncwa -a time -d time,7,359,12 nco/baseline.nc nco/clim_08.nc',
+        'ncks -H -C -v tas -d lat,0 -d lon,0 nco/clim_08.nc',
+    ),
+    (
+        'Calculate the September reference',
+        'NCO indices start at zero. The slice time,8,359,12 selects indices 8, 20, 32, …, 356: the 30 September fields in 1981–2010. ncwa -a time takes their arithmetic mean and removes the time dimension. The query shows one grid-point value.',
+        'ncwa -a time -d time,8,359,12 nco/baseline.nc nco/clim_09.nc',
+        'ncks -H -C -v tas -d lat,0 -d lon,0 nco/clim_09.nc',
+    ),
+    (
+        'Calculate the October reference',
+        'NCO indices start at zero. The slice time,9,359,12 selects indices 9, 21, 33, …, 357: the 30 October fields in 1981–2010. ncwa -a time takes their arithmetic mean and removes the time dimension. The query shows one grid-point value.',
+        'ncwa -a time -d time,9,359,12 nco/baseline.nc nco/clim_10.nc',
+        'ncks -H -C -v tas -d lat,0 -d lon,0 nco/clim_10.nc',
+    ),
+    (
+        'Calculate the November reference',
+        'NCO indices start at zero. The slice time,10,359,12 selects indices 10, 22, 34, …, 358: the 30 November fields in 1981–2010. ncwa -a time takes their arithmetic mean and removes the time dimension. The query shows one grid-point value.',
+        'ncwa -a time -d time,10,359,12 nco/baseline.nc nco/clim_11.nc',
+        'ncks -H -C -v tas -d lat,0 -d lon,0 nco/clim_11.nc',
+    ),
+    (
+        'Calculate the December reference',
+        'NCO indices start at zero. The slice time,11,359,12 selects indices 11, 23, 35, …, 359: the 30 December fields in 1981–2010. ncwa -a time takes their arithmetic mean and removes the time dimension. The query shows one grid-point value.',
+        'ncwa -a time -d time,11,359,12 nco/baseline.nc nco/clim_12.nc',
+        'ncks -H -C -v tas -d lat,0 -d lon,0 nco/clim_12.nc',
+    ),
+    (
+        'Combine the twelve reference fields',
+        'ncecat -u month creates a month dimension. The explicit file order runs from January through December; the result has twelve reference fields.',
+        'ncecat -u month nco/clim_01.nc nco/clim_02.nc nco/clim_03.nc nco/clim_04.nc nco/clim_05.nc nco/clim_06.nc nco/clim_07.nc nco/clim_08.nc nco/clim_09.nc nco/clim_10.nc nco/clim_11.nc nco/clim_12.nc nco/climatology_unlabelled.nc',
+        'ncks -m -C -v tas nco/climatology_unlabelled.nc',
+    ),
+    (
+        'Label calendar months 1–12',
+        'Assign the twelve calendar-month labels explicitly and save climatology.nc. The query prints all twelve labels.',
+        'ncap2 -s \'month[month]={1,2,3,4,5,6,7,8,9,10,11,12};month@long_name="calendar month";\' nco/climatology_unlabelled.nc nco/climatology.nc',
+        'ncks -H -C -v month nco/climatology.nc',
+    ),
+    (
+        'Name the reference temperature',
+        'ncrename -v old,new renames tas to tas_clim in a new file, so the monthly reference can coexist with the original tas.',
+        'ncrename -v tas,tas_clim nco/climatology.nc nco/clim_named.nc',
+        'ncks -m -C -v tas_clim nco/clim_named.nc',
+    ),
+    (
+        'Fix the month dimension',
+        'Fix the twelve-month dimension before appending the reference. Classic NetCDF permits one record dimension; time remains that dimension in the temperature file.',
+        'ncks --fix_rec_dmn month nco/clim_named.nc nco/clim_fixed.nc',
+        'ncks -m -C -v tas_clim nco/clim_fixed.nc',
+    ),
+    (
+        'Append the reference fields',
+        'ncks -A appends the selected tas_clim variable to celsius.nc. The monthly temperature values remain unchanged. The query shows the appended reference dimensions.',
+        'ncks -A -v tas_clim nco/clim_fixed.nc nco/celsius.nc',
+        'ncks -m -C -v tas_clim nco/celsius.nc',
+    ),
+    (
+        'Subtract the matching monthly reference',
+        'The 552 monthly records start in January. Within the ncap2 expression, t%12 selects the corresponding zero-based reference month. Each anomaly is tas minus tas_clim at the same latitude and longitude. The query shows the first anomaly at one grid point.',
+        'ncap2 -s \'tas_anom=tas;for(t=0;t<552;t++){tas_anom(t,:,:)=tas(t,:,:)-tas_clim(t%12,:,:);}tas_anom@units="degC";tas_anom@anomaly_reference_period="1981-2010";\' nco/celsius.nc nco/anomaly_all.nc',
+        'ncks -H -C -v tas_anom -d time,0 -d lat,0 -d lon,0 nco/anomaly_all.nc',
+    ),
+    (
+        'Save the monthly anomaly fields',
+        'Retain tas_anom and its time bounds in anomaly.nc. Its metadata shows 552 monthly fields; the twelve reference fields are no longer part of this output.',
+        'ncks -v tas_anom,time_bnds nco/anomaly_all.nc nco/anomaly.nc',
+        'ncks -m -C -v tas_anom nco/anomaly.nc',
+    ),
+    (
+        'Calculate each monthly duration',
+        'Subtract the lower time bound from the upper bound. duration is measured in the file’s time units. The query prints the first twelve monthly weights.',
+        "ncap2 -s 'duration[time]=double(time_bnds(:,1)-time_bnds(:,0));' nco/anomaly.nc nco/weighted.nc",
+        'ncks -H -C -v duration -d time,0,11 nco/weighted.nc',
+    ),
+    (
+        'Calculate the duration-weighted mean map',
+        'ncwa -a time -w duration computes Σ(anomaly × duration) / Σ(duration) at every grid point. map_mean.nc is a period-mean anomaly, not a trend. The query prints one map value.',
+        'ncwa -a time -w duration -v tas_anom nco/weighted.nc nco/map_mean.nc',
+        'ncks -H -C -v tas_anom -d lat,0 -d lon,0 nco/map_mean.nc',
+    ),
+    (
+        'Select the Arctic and average longitudes',
+        'Select latitude centres from 65°N to 90°N and use ncwa -a lon to average all longitudes equally. The query shows one latitude from the first monthly zonal-mean field.',
+        'ncwa -a lon -d lat,65.0,90.0 nco/anomaly.nc nco/arctic_zonal.nc',
+        'ncks -H -C -v tas_anom -d time,0 -d lat,0 nco/arctic_zonal.nc',
+    ),
+    (
+        'Average the Arctic latitudes',
+        'ncwa -a lat gives equal weight to the remaining latitude centres. No area weights are supplied. arctic_monthly.nc contains 552 monthly Arctic anomalies; the query shows its first twelve values.',
+        'ncwa -a lat nco/arctic_zonal.nc nco/arctic_monthly.nc',
+        'ncks -H -C -v tas_anom -d time,0,11 nco/arctic_monthly.nc',
+    ),
+    (
+        'Prepare the monthly record dimension',
+        'Make time the record dimension required by ncra. The monthly anomaly values are unchanged.',
+        'ncks --mk_rec_dmn time nco/arctic_monthly.nc nco/arctic_record.nc',
+        'ncks -m -C -v tas_anom nco/arctic_record.nc',
+    ),
+    (
+        'Average twelve months per year',
+        'ncra --mro retains multiple output records. The last two numbers in -d time,,,12,12 specify a twelve-record stride and a twelve-record averaging group. The result contains 46 annual values, 1979–2024, with equal monthly weights. The query shows the first five years.',
+        'ncra --mro -d time,,,12,12 nco/arctic_record.nc nco/arctic_annual.nc',
+        'ncks -H -C -v tas_anom -d time,0,4 nco/arctic_annual.nc',
+    ),
+    (
+        'Select the January bounds',
+        'Select monthly records 0, 12, 24, …, 540: January of each year. Their lower bounds provide the starts of the 46 annual intervals. The query shows the first pair of monthly bounds in the file’s numeric time units.',
+        'ncks -v time_bnds -d time,0,,12 nco/arctic_record.nc nco/year_starts.nc',
+        'ncks -H -C -v time_bnds -d time,0 nco/year_starts.nc',
+    ),
+    (
+        'Select the December bounds',
+        'Select records 11, 23, 35, …, 551: December of each year. Their upper bounds provide the ends of the 46 annual intervals.',
+        'ncks -v time_bnds -d time,11,,12 nco/arctic_record.nc nco/year_ends.nc',
+        'ncks -H -C -v time_bnds -d time,0 nco/year_ends.nc',
+    ),
+    (
+        'Extract the end of each year',
+        'The second column of the December bounds is the first day of the following January. Store it as year_end; the query prints its first three values.',
+        "ncap2 -s 'year_end[time]=time_bnds(:,1);' nco/year_ends.nc nco/year_ends_named.nc",
+        'ncks -H -C -v year_end -d time,0,2 nco/year_ends_named.nc',
+    ),
+    (
+        'Append the year-end values',
+        'Append year_end to the January-bound file. -C copies only the requested variable, preserving the existing time coordinate.',
+        'ncks -A -C -v year_end nco/year_ends_named.nc nco/year_starts.nc',
+        'ncks -H -C -v year_end -d time,0,2 nco/year_starts.nc',
+    ),
+    (
+        'Construct complete annual bounds',
+        'Retain each January lower bound and replace the upper bound with year_end. The first output interval now spans one complete calendar year.',
+        "ncap2 -s 'time_bnds(:,1)=year_end;' nco/year_starts.nc nco/year_bounds.nc",
+        'ncks -H -C -v time_bnds -d time,0 nco/year_bounds.nc',
+    ),
+    (
+        'Update the annual bounds',
+        'ncra averages monthly bounds as ordinary variables. Replace those bounds with the complete annual intervals just constructed. -A -C appends only time_bnds; the annual anomaly values and time coordinate are preserved.',
+        'ncks -A -C -v time_bnds nco/year_bounds.nc nco/arctic_annual.nc',
+        'ncks -H -C -v time_bnds -d time,0 nco/arctic_annual.nc',
     ),
 ]

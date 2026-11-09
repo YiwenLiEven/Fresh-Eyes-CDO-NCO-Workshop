@@ -1,104 +1,161 @@
-"""Visible, standalone CDO teaching steps for the updated workshop notebooks.
+"""One CDO calculation followed by one short inspection per teaching step.
 
-The notebook supplies a bash cell wrapper and runs each step in $DEMO_OUT/cdo.
-Its preparation cell creates work/ and two raw input symlinks in this directory.
+Each entry is (title, explanation, command, inspection). The notebook adds its
+own execution prefix. Run from a fresh demonstration directory containing
+``data/historical.nc``, ``data/ssp585.nc``, and an empty ``cdo/`` directory.
 """
 
 CDO_STEPS = [
     (
-        "Select temperature and years",
-        """Input: the historical and SSP585 files. Output: `work/historical.nc`
-and `work/ssp585.nc`, containing only monthly near-surface air temperature
-(`tas`) for 1979–2014 and 2015–2024. `DEMO_END` is 2024 for this exercise.
-`selname` selects the variable; `selyear` selects the dates.
-
-Each command reads its input file and writes its last file argument.
-The usual form is `cdo operator input.nc output.nc`. Each run creates fresh
-output files; start a new run before repeating the workflow.""",
-        """cdo selname,tas historical_input.nc work/historical_tas.nc
-cdo selyear,1979/2014 work/historical_tas.nc work/historical.nc
-cdo selname,tas ssp585_input.nc work/ssp585_tas.nc
-cdo selyear,2015/"$DEMO_END" work/ssp585_tas.nc work/ssp585.nc""",
+        "Select historical temperature",
+        "Keep near-surface air temperature from the historical file. "
+        "The inspection should show the variable name `tas`.",
+        "cdo selname,tas data/historical.nc cdo/historical_tas.nc",
+        "cdo showname cdo/historical_tas.nc",
     ),
     (
-        "Join the two experiments",
-        """Input: the two selected temperature files. Output: `work/merged.nc`.
-`mergetime` joins and sorts their monthly records into the continuous
-1979–2024 series: 552 months. Both experiments use the same ACCESS-CM2
-member and grid. The single `-b F64` option stores the joined data in double
-precision before calculations; later files inherit that precision.""",
-        """cdo -b F64 mergetime work/historical.nc work/ssp585.nc work/merged.nc""",
+        "Select 1979–2014",
+        "Keep the historical part of our analysis. "
+        "The inspection should report 432 monthly records.",
+        "cdo selyear,1979/2014 cdo/historical_tas.nc cdo/historical.nc",
+        "cdo ntime cdo/historical.nc",
     ),
     (
-        "Convert Kelvin to Celsius",
-        """Input: `work/merged.nc`, with temperature in Kelvin.
-Output: `work/celsius.nc`, in degrees Celsius.
-`subc,273.15` changes the values; `setunit,degC` updates the unit label.
-Changing the label alone would leave the values in Kelvin.""",
-        """cdo subc,273.15 work/merged.nc work/celsius_raw.nc
-cdo setunit,degC work/celsius_raw.nc work/celsius.nc""",
+        "Select SSP585 temperature",
+        "Keep `tas` from the SSP5-8.5 scenario file, using the same model "
+        "member and grid. Check that its variable is also `tas`.",
+        "cdo selname,tas data/ssp585.nc cdo/ssp585_tas.nc",
+        "cdo showname cdo/ssp585_tas.nc",
     ),
     (
-        "Select the reference period",
-        """Input: `work/celsius.nc`. Output: `work/baseline.nc`.
-Select 1981–2010, the fixed 30-year reference period, giving 360 months.
-This reference period stays fixed when the analysis is extended.""",
-        """cdo selyear,1981/2010 work/celsius.nc work/baseline.nc""",
+        "Select 2015–2024",
+        "Keep the scenario part needed for this analysis. "
+        "The inspection should report 120 monthly records.",
+        "cdo selyear,2015/2024 cdo/ssp585_tas.nc cdo/ssp585.nc",
+        "cdo ntime cdo/ssp585.nc",
     ),
     (
-        "Calculate twelve monthly reference fields",
-        """Input: `work/baseline.nc`. Output: `climatology.nc`, containing
-twelve temperature fields. `ymonmean` averages the 30 Januaries together,
-then the 30 Februaries, and so on. Each matching calendar month has equal
-weight; January and July have different reference fields.""",
-        """cdo ymonmean work/baseline.nc climatology.nc""",
+        "Join the experiments",
+        "Join the historical and scenario records in time order: 552 months "
+        "from 1979 through 2024. The single `-b F64` option saves double "
+        "precision before calculation; subsequent files inherit it.",
+        "cdo -b F64 mergetime cdo/historical.nc cdo/ssp585.nc cdo/merged.nc",
+        "cdo ntime cdo/merged.nc",
     ),
     (
-        "Subtract the matching monthly reference",
-        """Inputs: the full Celsius series and the twelve reference fields.
-Output: `anomaly.nc`, with 552 monthly anomaly fields.
-`ymonsub` subtracts the matching calendar-month reference at every grid
-point: January minus reference January, February minus reference February,
-and so on. `chname` renames `tas` to `tas_anom`; an anomaly is measured in
-degrees Celsius, with positive values warmer than that month's reference.""",
-        """cdo ymonsub work/celsius.nc climatology.nc work/anomaly_raw.nc
-cdo chname,tas,tas_anom work/anomaly_raw.nc anomaly.nc""",
+        "Convert the temperature values",
+        "Subtract 273.15 to convert Kelvin values to Celsius. The inspection "
+        "summarizes the first month's minimum, mean, and maximum; "
+        "`-seltimestep,1` restricts this check to one month.",
+        "cdo subc,273.15 cdo/merged.nc cdo/celsius_raw.nc",
+        "cdo infon -seltimestep,1 cdo/celsius_raw.nc",
     ),
     (
-        "Average the map with month-length weights",
-        """Input: `anomaly.nc`. Output: `map_mean.nc`, one mean anomaly map.
-At each grid point, calculate **sum(anomaly × days in month) / sum(days in
-month)**. This follows the upstream recipe's duration weighting.
-
-`muldpm` multiplies by each month's number of days and `timsum` sums over
-time. A field of ones gives the denominator using the same calendar,
-including leap years. The input checks require complete monthly bounds
-and valid data throughout, so this denominator covers the same samples.""",
-        """cdo muldpm anomaly.nc work/weighted.nc
-cdo timsum work/weighted.nc work/weighted_sum.nc
-cdo expr,'tas_anom=1;' anomaly.nc work/ones.nc
-cdo muldpm work/ones.nc work/days.nc
-cdo timsum work/days.nc work/weight_sum.nc
-cdo div work/weighted_sum.nc work/weight_sum.nc map_mean.nc""",
+        "Update the unit label",
+        "The values have been converted; now label them `degC`. "
+        "Check the unit. Changing this label alone would not convert values.",
+        "cdo setunit,degC cdo/celsius_raw.nc cdo/celsius.nc",
+        "cdo showunit cdo/celsius.nc",
     ),
     (
-        "Average the Arctic grid points",
-        """Input: `anomaly.nc`. Output: `arctic_monthly.nc`, one anomaly per
-month. `sellonlatbox` selects all longitudes and grid-point latitudes from
-65°N to 90°N. `fldmean,weights=false` gives each selected grid point equal
-weight. On this complete rectangular grid, that matches the recipe's
-unweighted longitude mean followed by its unweighted latitude mean.
-This is an unweighted regional mean, not an area-weighted mean.""",
-        """cdo sellonlatbox,0,360,65,90 anomaly.nc work/arctic.nc
-cdo fldmean,weights=false work/arctic.nc arctic_monthly.nc""",
+        "Select the 1981–2010 reference period",
+        "Keep the fixed 30-year reference period. "
+        "Check that it contains 360 monthly records.",
+        "cdo selyear,1981/2010 cdo/celsius.nc cdo/baseline.nc",
+        "cdo ntime cdo/baseline.nc",
     ),
     (
-        "Average the twelve months in each year",
-        """Input: `arctic_monthly.nc`. Output: `arctic_annual.nc`, one Arctic
-anomaly for each of the 46 years. `yearmean` gives the twelve monthly
-samples equal weight, matching the upstream annual-statistics definition.
-The annual series therefore uses equal month weights, while the map above
-uses month-length weights.""",
-        """cdo yearmean arctic_monthly.nc arctic_annual.nc""",
+        "Calculate twelve reference months",
+        "Average the 30 Januaries, the 30 Februaries, and so on, giving "
+        "each matching month equal weight. Check that the output contains "
+        "calendar months 1 through 12.",
+        "cdo ymonmean cdo/baseline.nc cdo/climatology.nc",
+        "cdo showmon cdo/climatology.nc",
+    ),
+    (
+        "Subtract the matching reference month",
+        "Subtract reference January from each January, reference February "
+        "from each February, and so on. Inspect the first month's anomaly "
+        "range in degrees Celsius; positive values are warmer than its reference.",
+        "cdo ymonsub cdo/celsius.nc cdo/climatology.nc cdo/anomaly_raw.nc",
+        "cdo infon -seltimestep,1 cdo/anomaly_raw.nc",
+    ),
+    (
+        "Name the anomaly variable",
+        "Rename `tas` to `tas_anom` without changing the values. "
+        "Check the new variable name in the monthly anomaly product.",
+        "cdo chname,tas,tas_anom cdo/anomaly_raw.nc cdo/anomaly.nc",
+        "cdo showname cdo/anomaly.nc",
+    ),
+    (
+        "Multiply anomalies by month length",
+        "The map uses duration weights: sum(anomaly × days) / sum(days). "
+        "First multiply each anomaly by its month's number of days. "
+        "The first-month summary is January's anomaly multiplied by 31.",
+        "cdo muldpm cdo/anomaly.nc cdo/weighted.nc",
+        "cdo infon -seltimestep,1 cdo/weighted.nc",
+    ),
+    (
+        "Sum the weighted anomalies",
+        "Sum over all months at each grid point to obtain the map's numerator. "
+        "The inspection now summarizes one accumulated field.",
+        "cdo timsum cdo/weighted.nc cdo/weighted_sum.nc",
+        "cdo infon cdo/weighted_sum.nc",
+    ),
+    (
+        "Create a field of ones",
+        "Create one at every grid point and month for the denominator. "
+        "The first-month minimum, mean, and maximum should all be 1. "
+        "The input data have valid data throughout and complete monthly bounds.",
+        "cdo expr,'tas_anom=1;' cdo/anomaly.nc cdo/ones.nc",
+        "cdo infon -seltimestep,1 cdo/ones.nc",
+    ),
+    (
+        "Count the days in each month",
+        "Multiply the ones by month length using the file's calendar, "
+        "including leap years. For January 1979, all three summary values "
+        "should be 31.",
+        "cdo muldpm cdo/ones.nc cdo/days.nc",
+        "cdo infon -seltimestep,1 cdo/days.nc",
+    ),
+    (
+        "Sum the calendar days",
+        "Sum the month lengths to obtain the denominator. "
+        "For 1979–2024, the summary should show 16,802 days everywhere.",
+        "cdo timsum cdo/days.nc cdo/weight_sum.nc",
+        "cdo infon cdo/weight_sum.nc",
+    ),
+    (
+        "Calculate the duration-weighted map",
+        "Divide the weighted anomaly sum by the day count. "
+        "Inspect the minimum, mean, and maximum of the resulting anomaly map "
+        "in degrees Celsius. This preserves the upstream duration weighting.",
+        "cdo div cdo/weighted_sum.nc cdo/weight_sum.nc cdo/map_mean.nc",
+        "cdo infon cdo/map_mean.nc",
+    ),
+    (
+        "Select the Arctic",
+        "Keep all longitudes and grid-point latitudes from 65°N to 90°N. "
+        "The inspection reports how many grid points remain in this region.",
+        "cdo sellonlatbox,0,360,65,90 cdo/anomaly.nc cdo/arctic.nc",
+        "cdo ngridpoints cdo/arctic.nc",
+    ),
+    (
+        "Calculate the monthly Arctic mean",
+        "Give every selected grid point equal weight. On this complete "
+        "rectangular grid, this matches the recipe's unweighted longitude "
+        "mean followed by its unweighted latitude mean. Inspect the first "
+        "month's single regional anomaly.",
+        "cdo fldmean,weights=false cdo/arctic.nc cdo/arctic_monthly.nc",
+        "cdo outputtab,date,value -seltimestep,1 cdo/arctic_monthly.nc",
+    ),
+    (
+        "Calculate the annual Arctic mean",
+        "Average each year's twelve monthly samples with equal weights, "
+        "matching the upstream annual definition. Check that there are "
+        "46 annual values. The map above uses month-length weights; "
+        "this annual series uses equal month weights.",
+        "cdo yearmean cdo/arctic_monthly.nc cdo/arctic_annual.nc",
+        "cdo ntime cdo/arctic_annual.nc",
     ),
 ]
