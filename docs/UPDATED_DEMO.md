@@ -7,7 +7,7 @@
 
 Run the Data cell first, then continue with **Shift+Enter**, including collapsed
 cells. Each processing cell contains **one direct command** beginning with
-`!cdo`, `!ncks` or another NCO tool. The next cell contains a short CDO/NCO query
+`cdo`, `ncks` or another NCO tool. The next cell contains a short CDO/NCO query
 that displays the result immediately. Read its output before proceeding to the
 next transformation. If a command reports an error or the query differs from
 the expected result, inspect that step before continuing.
@@ -18,9 +18,9 @@ CDO products go into `cdo/`, and NCO products into `nco/`. These same literal
 paths appear in the commands. Collapsed cells handle data checks, the independent
 reference and figures; no Python editing is needed to follow the calculations.
 
-The leading `!` tells Jupyter to run the installed tool. To use a command in a
-terminal, first enter the run directory printed in the Data output, then copy
-the command without `!`. To repeat the whole calculation, start again from the
+Run the commands exactly as shown. To use a command in a terminal, first enter
+the run directory printed in the Data output, then copy the same command text.
+To repeat the whole calculation, start again from the
 first cell; a new run directory keeps the previous files intact.
 
 The short queries make each transformation observable:
@@ -154,7 +154,7 @@ stripe color scale.
 
 ## Verification by revision
 
-The current one-command/one-query format passed complete local, in-process
+The current one-command/one-query format with bare command names passed complete local, in-process
 IPython execution using real ACCESS-CM2 data for 1979–2024: 552 monthly fields
 and 46 annual values. Every code cell completed successfully, every query cell
 produced output, and all standard error streams were empty.
@@ -167,15 +167,18 @@ produced output, and all standard error streams were empty.
 All ten product comparisons passed in each notebook. The largest absolute
 difference from the independent reference was **3.552713678800501e-15°C**;
 method and coordinate checks also passed. The
-[command-and-result verification record](command_observe_verification_20261109.json)
+[plain-command verification record](plain_commands_verification_20261109.json)
 records notebook hashes, cell counts, numerical results and the execution
 method. This is local in-process evidence. Online CI and a live Binder check
-of this revision are pending.
+of this revision are pending at publication. Literal-routing checks also verify
+all 126 command strings and arguments, including NCO brace expressions, and
+confirm that a failed external command raises an error.
 
 Earlier evidence keeps its original scope:
 
 | Evidence | Revision and scope |
 | --- | --- |
+| [Command-and-result checks](command_observe_verification_20261109.json) and [Linux CI](https://github.com/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/actions/runs/42593420426) | `fcc5539...`: all 119/134 cells executed; focused live Binder CDO/NCO command/query checks also passed, before the change to bare command names |
 | [Simplified-command checks](simple_commands_verification_20261109.json) | `4228f76...`: the earlier 24/30-cell notebooks, before processing and result queries were split into individual cells |
 | [Simplified-command Linux CI](https://github.com/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/actions/runs/42589034931) | `4228f76...`: successful build and 24/30-cell kernel execution |
 | [Earlier inline-command checks](inline_commands_verification_20261109.json) | `88d9fc0...`: earlier 24/30-cell local execution |

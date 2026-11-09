@@ -1,6 +1,6 @@
 """Execute notebook cells with IPython in-process when a kernel socket is unavailable.
 
-This verifies the prepared cell code, including direct ! commands, but is NOT a live Jupyter
+This verifies the prepared cell code, including direct CDO/NCO commands, but is NOT a live Jupyter
 or Binder test. Normal Binder builds should still use nbconvert --execute.
 """
 from pathlib import Path

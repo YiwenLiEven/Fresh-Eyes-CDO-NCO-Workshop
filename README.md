@@ -22,7 +22,7 @@ closing a temporary Binder session.
 
 1. Start with the Data cell and use **Shift+Enter** to run cells in order,
    including collapsed cells. Each new run gets its own output directory.
-2. Run one direct processing command, such as `!cdo` or `!ncks`, in its own cell.
+2. Run one direct processing command, such as `cdo` or `ncks`, in its own cell.
    The commands use the actual input names `data/historical.nc` and
    `data/ssp585.nc`, and write results under `cdo/` or `nco/`.
 3. Immediately run the next cell: a short CDO/NCO query displays the new file's
@@ -32,8 +32,8 @@ closing a temporary Binder session.
    An independent Python calculation supplies the reference; its support code
    remains collapsed.
 
-The leading `!` tells Jupyter to run an installed command. In a terminal, omit
-`!` and work in the run directory printed by the Data cell. To repeat the whole
+Run the commands exactly as shown. In a terminal, use the same command text
+and work in the run directory printed by the Data cell. To repeat the whole
 calculation, return to the first cell and start a new run; earlier files remain
 in their previous output directory.
 
@@ -74,7 +74,7 @@ remain available for software tests.
 
 ## Verification by revision
 
-The current command-and-result notebooks passed complete local, in-process
+The current notebooks with bare command names passed complete local, in-process
 IPython execution with real ACCESS-CM2 data: **119/119 code cells** in the main
 notebook and **134/134** in the practice notebook. The main lesson contains
 20 CDO and 37 NCO processing commands, each followed by a query cell; the practice
@@ -83,9 +83,16 @@ error output was recorded.
 
 All ten product comparisons passed in each notebook; the largest absolute
 difference from the reference was **3.552713678800501e-15°C**. See the
-[command-and-result verification record](docs/command_observe_verification_20261109.json)
-for notebook hashes, cell counts and execution details. Online CI and a live
-Binder check of this revision are pending.
+[plain-command verification record](docs/plain_commands_verification_20261109.json)
+for notebook hashes, cell counts and execution details. It also confirms that
+all 126 command strings, including NCO array literals, reach the installed tools
+unchanged and that failed commands raise an error. Online CI and a live Binder
+check of this revision are pending at publication.
+
+The preceding `fcc5539...` revision passed [Linux CI run 42593420426](https://github.com/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/actions/runs/42593420426)
+with all 119/134 cells executed. Its main page also passed a focused live Binder
+check of CDO selection/query pairs and an NCO selection/query pair. That record
+predates the current change to bare command names.
 
 The [previous simplified-command record](docs/simple_commands_verification_20261109.json)
 and successful [Linux CI run 42589034931](https://github.com/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/actions/runs/42589034931)

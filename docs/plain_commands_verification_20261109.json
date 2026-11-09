@@ -1,0 +1,45 @@
+{
+  "date": "2026-11-09",
+  "change": "Visible CDO/NCO cells use bare command names, with no notebook prefix.",
+  "execution_method": "IPython in-process; not a live Jupyter kernel or browser session",
+  "passed": true,
+  "notebooks": [
+    {
+      "path": "notebooks/00_yl_20_minute_binder_demo.ipynb",
+      "sha256": "ea086c7fa54514554741a2981aa88103822ee052cb7dd62e0f1245a3e9d8a681",
+      "code_cells_passed": 119,
+      "visible_commands": 114,
+      "inspection_cells": 57,
+      "all_inspections_nonempty": true,
+      "maximum_inspection_lines": 19,
+      "commands_identical_to_fcc5539_after_prefix_removal": true,
+      "no_visible_bang_magic_or_shell_variables": true,
+      "all_ten_product_comparisons_passed": true,
+      "maximum_absolute_difference_degC": 3.552713678800501e-15
+    },
+    {
+      "path": "notebooks/04_monthly_anomaly_hands_on.ipynb",
+      "sha256": "fe450de0c17dc36d54521548c949c9dee838f3419e04be115991e5ce3c508a24",
+      "code_cells_passed": 134,
+      "visible_commands": 126,
+      "inspection_cells": 63,
+      "all_inspections_nonempty": true,
+      "maximum_inspection_lines": 19,
+      "commands_identical_to_fcc5539_after_prefix_removal": true,
+      "no_visible_bang_magic_or_shell_variables": true,
+      "all_ten_product_comparisons_passed": true,
+      "maximum_absolute_difference_degC": 3.552713678800501e-15
+    }
+  ],
+  "literal_routing": {
+    "commands_checked": 126,
+    "all_strings_and_arguments_preserved": true,
+    "nco_array_literals_preserved": true,
+    "variable_expansion_disabled": true,
+    "failed_command_raises": true,
+    "failure_returncode": 1
+  },
+  "documentation": "https://ipython.readthedocs.io/en/stable/interactive/magics.html",
+  "online_ci_verified_for_this_revision": false,
+  "public_binder_verified_for_this_revision": false
+}

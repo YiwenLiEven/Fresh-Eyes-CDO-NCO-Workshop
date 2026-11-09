@@ -39,6 +39,7 @@ from pathlib import Path
 import os, sys, subprocess, json, uuid, shlex
 from datetime import datetime, timezone
 from IPython.display import display, Image
+from IPython.core.magic import no_var_expand
 
 ROOT = next((p for p in (Path.cwd().resolve(), *Path.cwd().resolve().parents)
              if (p / "scripts/run_python_updated.py").is_file()), None)
@@ -74,14 +75,23 @@ for directory in ("data", "cdo", "nco", "exercises"):
 (RUN / "data/ssp585.nc").symlink_to(FUTURE.resolve())
 os.chdir(RUN)
 
-# Execute each visible ! command directly; no shell expansion or script wrapper.
+# Execute each visible command directly; no shell expansion or script wrapper.
 # A failed command raises an exception, so Run All cannot silently continue.
 def run_command(command):
     result = subprocess.run(shlex.split(command), stdin=subprocess.DEVNULL,
                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     print(result.stdout, end="")
     result.check_returncode()
-get_ipython().system = run_command
+ip = get_ipython()
+ip.automagic = True
+def register_tool(tool):
+    # Preserve NCO array literals and expressions exactly as written.
+    @no_var_expand
+    def execute(arguments):
+        run_command(tool + " " + arguments)
+    ip.register_magic_function(execute, magic_kind="line", magic_name=tool)
+for tool in ("cdo", "ncap2", "ncatted", "ncecat", "ncks", "ncra", "ncrcat", "ncrename", "ncwa"):
+    register_tool(tool)
 print("DATA MODE:", "SYNTHETIC SOFTWARE TEST — NOT ACCESS-CM2" if DATA_MODE == "synthetic" else "REAL ACCESS-CM2: historical + SSP5-8.5")
 print("Analysis:", f"1979–{END_YEAR}", "| Monthly reference: 1981–2010")
 print("Outputs:", RUN.relative_to(ROOT))
@@ -130,16 +140,15 @@ def command_cells(route, steps, section):
         assert "\n" not in command and "\n" not in inspection
         assert "$" not in command and "$" not in inspection
         cells.append(md(f"### {section}.{number:02d} · {title}\n\n{explanation}"))
-        cells.append(code("!" + command, tags=[f"{route}-processing"]))
+        cells.append(code(command, tags=[f"{route}-processing"]))
         cells.append(md("**Inspect the result**"))
-        cells.append(code("!" + inspection, tags=[f"{route}-inspection"]))
+        cells.append(code(inspection, tags=[f"{route}-inspection"]))
     return cells
 
 command_intro = '''Run **one command**, then run the next cell to **inspect its result**.
 Read the output before moving on. Use **Shift+Enter** for each cell.
 
-The leading `!` runs a command in this notebook. The command itself is the same
-CDO or NCO command you would type in a terminal; omit `!` there.
+Run each command exactly as shown. You can use the same command text in a terminal.
 
 - `data/historical.nc` and `data/ssp585.nc` are the two input files.
 - `cdo/` and `nco/` hold the files created by each tool.
