@@ -1,0 +1,104 @@
+{
+  "date": "2026-11-09",
+  "timezone": "Asia/Shanghai",
+  "repository": "https://github.com/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop",
+  "tested_source_commit": "fe1dc89f49a4cd32c72283056d2b5e1ce29d362b",
+  "provider": "BIDS Binder",
+  "public_session_launched": true,
+  "recommended_seminar_launch_url": "https://bids.mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/fe1dc89f49a4cd32c72283056d2b5e1ce29d362b?urlpath=lab/tree/notebooks/00_yl_20_minute_binder_demo.ipynb",
+  "participant_launch_url": "https://bids.mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/fe1dc89f49a4cd32c72283056d2b5e1ce29d362b?urlpath=lab/tree/notebooks/04_monthly_anomaly_hands_on.ipynb",
+  "generic_mybinder_fallback_url": "https://mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/fe1dc89f49a4cd32c72283056d2b5e1ce29d362b?urlpath=lab/tree/notebooks/00_yl_20_minute_binder_demo.ipynb",
+  "versions": {
+    "cdo": "2.6.5",
+    "nco": "5.4.2",
+    "python": "3.11.18"
+  },
+  "data": {
+    "source_id": "ACCESS-CM2",
+    "experiments": [
+      "historical",
+      "ssp585"
+    ],
+    "data_mode": "real",
+    "analysis_period": "1979-2024",
+    "months": 552,
+    "years": 46,
+    "monthly_reference_period": "1981-2010"
+  },
+  "main_notebook": {
+    "path": "notebooks/00_yl_20_minute_binder_demo.ipynb",
+    "execution_method": "Rerun all code cells in live public Binder Jupyter UI",
+    "code_cells_completed": 8,
+    "passed": true,
+    "kernel_state": "Idle",
+    "ui_progress_percent": 100,
+    "product_comparisons_passed": 10,
+    "maximum_absolute_difference_degC": 1.509903313490213e-14,
+    "absolute_tolerance_degC": 0.0003,
+    "relative_tolerance": 0,
+    "figure_inspected": true,
+    "figure_observations": [
+      "Real-data label visible",
+      "Three corresponding Python/CDO/NCO columns",
+      "Mean anomaly maps, Arctic series and annual stripes visible"
+    ]
+  },
+  "participant_notebook": {
+    "path": "notebooks/04_monthly_anomaly_hands_on.ipynb",
+    "full_linux_build_nbconvert_passed": true,
+    "code_cells_completed_in_build": 10,
+    "separate_live_browser_rerun_status": "passed",
+    "execution_method": "Restart Kernel and Run All in the same public BIDS Binder Jupyter session",
+    "code_cells_completed_live": 10,
+    "passed": true,
+    "kernel_state": "Idle",
+    "ui_progress_percent": 100,
+    "real_1979_2024_setup_observed": true,
+    "final_execution_count": 10,
+    "baseline_monthly_residual_degC": 5.968558980384842e-14,
+    "baseline_check_passed": true,
+    "arctic_70N_cdo_nco_maximum_difference_degC": 3.019806626980426e-14,
+    "arctic_70N_vs_65N_maximum_change_degC": 1.2266452280680342
+  },
+  "linux_build": {
+    "environment_manifest": "binder/environment.yml",
+    "fresh_environment": true,
+    "tests_passed": 8,
+    "warnings": "One NumPy compatibility warning remained",
+    "both_notebooks_nbconvert_passed": true,
+    "source_hashes_and_cell_counts_checked": true,
+    "compaction_completed": true,
+    "build_record_url": "https://github.com/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/blob/main/docs/updated_verification/linux_build.json",
+    "compaction_record_url": "https://github.com/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/blob/main/docs/updated_verification/linux_compaction.json"
+  },
+  "earlier_launch_issues": [
+    "One mybinder.org node failed before startup: fsnotify: too many open files",
+    "GESIS attempt encountered a TLS failure"
+  ],
+  "not_verified": [
+    "Direct numerical agreement with Evgenia saved ESMValTool outputs",
+    "Interactive local Mac Jupyter browser session"
+  ],
+  "privacy": "No temporary Binder session addresses, credentials or tokens are included.",
+  "github_ci": {
+    "url": "https://github.com/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/actions/runs/42568209901",
+    "run_number": 8,
+    "attempt": 2,
+    "commit": "95b89e87aacacde7ec98aaf94f0188214a2d6dea",
+    "observed_status": "Success",
+    "total_duration_seconds": 197,
+    "scientific_equivalence_job_duration_seconds": 193,
+    "artifact_count": 1,
+    "warning": "Node.js 20 deprecation warning; not a failure",
+    "downloaded_build_receipt_url": "https://github.com/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/blob/main/docs/updated_verification/github_actions_build.json"
+  },
+  "ci_verified_code_revision": "95b89e87aacacde7ec98aaf94f0188214a2d6dea",
+  "ci_revision_change": "Data-download retries",
+  "ci_status": "success",
+  "local_mac_tests": {
+    "passed": 12,
+    "duration_seconds": 8.73,
+    "warnings": "One NumPy compatibility warning remained"
+  },
+  "revision_scope": "Public Binder verification applies to tested_source_commit; CI verification applies to ci_verified_code_revision. Later documentation-only commits do not change the recorded tested code revisions."
+}

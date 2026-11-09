@@ -1,0 +1,192 @@
+{
+  "completed_utc": "2026-11-09T05:41:42.947664+00:00",
+  "python": "3.11.18",
+  "packages": {
+    "xarray": "2026.9.0",
+    "numpy": "2.4.6",
+    "netCDF4": "1.7.4",
+    "nbconvert": "7.17.2"
+  },
+  "tools": {
+    "cdo": "Climate Data Operators version 2.6.5 (https://mpimet.mpg.de/cdo)\nSystem: x86_64-conda-linux-gnu\nCXX Compiler: x86_64-conda-linux-gnu-c++ -std=gnu++20 -fPIC -DPIC -g -O2 -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/runner/micromamba/envs/fresh-eyes/include -fdebug-prefix-map=/home/conda/feedstock_root/build_artifacts/cdo_1793023443978/work=/usr/local/src/conda/cdo-2.6.5 -fdebug-prefix-map=/home/runner/micromamba/envs/fresh-eyes=/usr/local/src/conda-prefix -fopenmp -pthread\nCXX version : x86_64-conda-linux-gnu-c++ (conda-forge gcc 15.3.0-7) 15.3.0\nCXX library :\nC Compiler: x86_64-conda-linux-gnu-cc -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/runner/micromamba/envs/fresh-eyes/include -fdebug-prefix-map=/home/conda/feedstock_root/build_artifacts/cdo_1793023443978/work=/usr/local/src/conda/cdo-2.6.5 -fdebug-prefix-map=/home/runner/micromamba/envs/fresh-eyes=/usr/local/src/conda-prefix -fopenmp -pthread -pthread\nC version : x86_64-conda-linux-gnu-cc (conda-forge gcc 15.3.0-7) 15.3.0\nF77 Compiler: /home/conda/feedstock_root/build_artifacts/cdo_1793023443978/_build_env/bin/x86_64-conda-linux-gnu-gfortran -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -fno-merge-constants -isystem /home/runner/micromamba/envs/fresh-eyes/include -I/home/conda/feedstock_root/build_artifacts/cdo_1793023443978/_build_env/include -fdebug-prefix-map=/home/conda/feedstock_root/build_artifacts/cdo_1793023443978/work=/usr/local/src/conda/cdo-2.6.5 -fdebug-prefix-map=/home/runner/micromamba/envs/fresh-eyes=/usr/local/src/conda-prefix\nF77 version : GNU Fortran (conda-forge gcc 15.3.0-7) 15.3.0\nFeatures: 15G 4Cores c++20 OpenMP45 pthreads HDF5 NC4/HDF5 dap udunits2 proj xml2 magics curl fftw3 sse3\nLibraries: yac_core/1.3.0 NetCDF/4.10.1 HDF5/2.2.0 proj/9.9.0 xml2/2.15.4 curl/8.23.0 magics/4.17.1\nCDI data types: SizeType=size_t\nCDI file types: srv ext ieg grb1 grb2 nc1 nc2 nc4 nc4c nc5 nczarr \n     CDI library version : 2.6.5\n cgribex library version : 2.3.1\n ecCodes library version : 2.50.0\n  NetCDF library version : 4.10.1 of Nov  7 2026 18:27:47 $\n    exse library version : 2.1.0\n    FILE library version : 1.9.2",
+    "ncks": "NCO netCDF Operators version 5.4.2 \"Flooded with Friends\" built by nobody on nowhere at Nov  3 2026 11:46:20\nncks version 5.4.2"
+  },
+  "shared_reference_commit": "040b9c7962355b1f8fa1312b7af867b458102b85",
+  "data_mode": "real",
+  "analysis_period": "1979-2024",
+  "main_evidence_file": "outputs/updated_real_build/updated_validation.json",
+  "independent_workflow_validation": {
+    "input": {
+      "source_id": "ACCESS-CM2",
+      "variant_label": "r1i1p1f1",
+      "period": "1979-2024",
+      "baseline": "1981-2010",
+      "months": 552,
+      "years": 46,
+      "calendar": "proleptic_gregorian",
+      "time_units": "days since 1850-01-01",
+      "synthetic": false
+    },
+    "absolute_tolerance_degC": 0.0003,
+    "comparisons": {
+      "cdo/climatology": {
+        "max_absolute_difference_degC": 0.0,
+        "passed": true
+      },
+      "nco/climatology": {
+        "max_absolute_difference_degC": 0.0,
+        "passed": true
+      },
+      "cdo/anomaly": {
+        "max_absolute_difference_degC": 0.0,
+        "passed": true
+      },
+      "nco/anomaly": {
+        "max_absolute_difference_degC": 0.0,
+        "passed": true
+      },
+      "cdo/map_mean": {
+        "max_absolute_difference_degC": 0.0,
+        "passed": true
+      },
+      "nco/map_mean": {
+        "max_absolute_difference_degC": 0.0,
+        "passed": true
+      },
+      "cdo/arctic_monthly": {
+        "max_absolute_difference_degC": 1.509903313490213e-14,
+        "passed": true
+      },
+      "nco/arctic_monthly": {
+        "max_absolute_difference_degC": 2.6645352591003757e-15,
+        "passed": true
+      },
+      "cdo/arctic_annual": {
+        "max_absolute_difference_degC": 1.3322676295501878e-15,
+        "passed": true
+      },
+      "nco/arctic_annual": {
+        "max_absolute_difference_degC": 4.440892098500626e-16,
+        "passed": true
+      }
+    },
+    "invariants": {
+      "python": {
+        "baseline_residual_degC": 5.968558980384842e-14,
+        "annual_equal_months": true,
+        "time_coverage": true,
+        "weighted_vs_arithmetic_map_difference_degC": 0.007861762999614247
+      },
+      "cdo": {
+        "baseline_residual_degC": 5.968558980384842e-14,
+        "annual_equal_months": true,
+        "time_coverage": true,
+        "annual_bounds_full_year": true,
+        "weighted_vs_arithmetic_map_difference_degC": 0.007861762999614247
+      },
+      "nco": {
+        "baseline_residual_degC": 5.968558980384842e-14,
+        "annual_equal_months": true,
+        "time_coverage": true,
+        "annual_bounds_full_year": true,
+        "weighted_vs_arithmetic_map_difference_degC": 0.007861762999614247
+      }
+    },
+    "passed": true
+  },
+  "comparison_scope": "Three independent Python/CDO/NCO routes; not an upstream ESMValTool rerun.",
+  "legacy": {
+    "analysis_period": "1979-2014",
+    "data_mode": "synthetic",
+    "shared_reference_commit": "393cfcf876fa47c6c231c3be70dbd9f8552fe3a3",
+    "independent_workflow_validation": {
+      "cdo_vs_python/monthly": {
+        "max_absolute_difference_degC": 8.138020831438553e-06,
+        "absolute_tolerance_degC": 0.0003,
+        "passed": true
+      },
+      "nco_vs_python/monthly": {
+        "max_absolute_difference_degC": 8.138020831438553e-06,
+        "absolute_tolerance_degC": 0.0003,
+        "passed": true
+      },
+      "cdo_vs_python/map": {
+        "max_absolute_difference_degC": 1.9596406702106217e-06,
+        "absolute_tolerance_degC": 0.0003,
+        "passed": true
+      },
+      "nco_vs_python/map": {
+        "max_absolute_difference_degC": 1.9596406702106217e-06,
+        "absolute_tolerance_degC": 0.0003,
+        "passed": true
+      },
+      "cdo_vs_python/arctic_monthly": {
+        "max_absolute_difference_degC": 3.659062913774491e-07,
+        "absolute_tolerance_degC": 0.0003,
+        "passed": true
+      },
+      "nco_vs_python/arctic_monthly": {
+        "max_absolute_difference_degC": 3.659062913774491e-07,
+        "absolute_tolerance_degC": 0.0003,
+        "passed": true
+      },
+      "cdo_vs_python/arctic_annual": {
+        "max_absolute_difference_degC": 3.781583565731772e-08,
+        "absolute_tolerance_degC": 0.0003,
+        "passed": true
+      },
+      "nco_vs_python/arctic_annual": {
+        "max_absolute_difference_degC": 3.781583565731772e-08,
+        "absolute_tolerance_degC": 0.0003,
+        "passed": true
+      }
+    }
+  },
+  "notebooks": {
+    "00_yl_20_minute_binder_demo": {
+      "data_mode": "real",
+      "analysis_period": "1979-2024",
+      "code_cell_count": 8,
+      "execution_counts": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "all_code_cells_executed": true,
+      "error_outputs": 0,
+      "source_sha256": "d3b174b1bed5e897728ad6d5caf1b9dbc067fc23cd522aed2e3fb5967c66428e",
+      "executed_sha256": "44091f594ab1664b208f6e0c1ac6ffbcbe828afaf876592fc61ca2a5bb59c0c8",
+      "run_validation_file": "outputs/updated_real_20261109T054030_54c8c3/updated_validation.json",
+      "run_validation_passed": true
+    },
+    "04_monthly_anomaly_hands_on": {
+      "data_mode": "real",
+      "analysis_period": "1979-2024",
+      "code_cell_count": 10,
+      "execution_counts": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "all_code_cells_executed": true,
+      "error_outputs": 0,
+      "source_sha256": "cd9ffcf2b2092e9c724a1a2e2a949cc0e448e61192323afe984fc4d52ea73730",
+      "executed_sha256": "096d7a876aeabc8378ba634134d5ddc2d9982b697c4c160272b423f387a18cdf",
+      "run_validation_file": "outputs/updated_real_20261109T054107_51c59f/updated_validation.json",
+      "run_validation_passed": true
+    }
+  },
+  "notebooks_executed": true
+}

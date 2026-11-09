@@ -171,16 +171,49 @@ socket. The checks therefore used IPython in-process, including the prepared
 Bash cells, via `scripts/check_updated_notebook_cells.py`. They verify the cell
 code but do not establish that a Jupyter browser session or Binder image launched.
 
-## Binder publication status
+## Public Binder and publication
 
-The public target remains
+The updated code is published in
 [YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop](https://github.com/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop).
-The local update is prepared in the restored workshop folder. A local notebook PASS
-is not evidence that the new GitHub revision has been published or that a new
-Binder image has built. Those steps require a publication receipt and a fresh
-Binder verification. Existing old pinned links continue to identify the old code.
+Use the tested code revision `fe1dc89f49a4cd32c72283056d2b5e1ce29d362b` for seminar links:
 
-After publishing and checking a new revision, share a Binder URL pinned to that
-verified commit and open `notebooks/00_yl_20_minute_binder_demo.ipynb`. Binder sessions
-are temporary; save outputs and edited notebooks before leaving. The old seminar
-and participant notebook sources are retained under the `legacy_` prefix.
+- [20-minute seminar — recommended BIDS Binder](https://bids.mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/fe1dc89f49a4cd32c72283056d2b5e1ce29d362b?urlpath=lab/tree/notebooks/00_yl_20_minute_binder_demo.ipynb)
+- [Participant practice — BIDS Binder](https://bids.mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/fe1dc89f49a4cd32c72283056d2b5e1ce29d362b?urlpath=lab/tree/notebooks/04_monthly_anomaly_hands_on.ipynb)
+- [Generic mybinder.org fallback](https://mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/fe1dc89f49a4cd32c72283056d2b5e1ce29d362b?urlpath=lab/tree/notebooks/00_yl_20_minute_binder_demo.ipynb)
+
+The public BIDS Binder session launched successfully, and the main notebook was
+rerun in live Jupyter through all 8 code cells. The UI reached Idle / 100%.
+The run used real ACCESS-CM2 historical + SSP5-8.5 data: 552 months, 1979–2024,
+with the 1981–2010 monthly reference. All ten product comparisons passed, with
+a maximum difference of 1.509903313490213e-14°C. The final figure was inspected
+for its real-data label and corresponding Python/CDO/NCO maps, Arctic series and
+annual stripes. Recorded versions were CDO 2.6.5, NCO 5.4.2 and Python 3.11.18.
+See [binder_launch_verification_20261109.json](binder_launch_verification_20261109.json).
+
+The participant notebook also passed all 10 code cells after Restart Kernel
+and Run All in the same public BIDS session, reaching Idle / 100%. Its setup
+showed real 1979–2024 inputs; the final cell passed the monthly reference-residual
+check at 5.968558980384842e-14°C. The 70°N exercise gave a CDO/NCO maximum
+difference of 3.019806626980426e-14°C; changing the boundary from 65°N to 70°N
+changed the monthly values by up to 1.2266452280680342°C. These are two different
+comparisons: the first tests implementation agreement, the second changes the
+scientific region. Both notebooks also passed the fresh Linux build through
+`nbconvert`; the verification writer checked their source hashes and cell counts. Linux evidence is published in
+[linux_build.json](https://github.com/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/blob/main/docs/updated_verification/linux_build.json) and
+[linux_compaction.json](https://github.com/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/blob/main/docs/updated_verification/linux_compaction.json). The eight-test Linux suite passed with one
+NumPy compatibility warning, and output compaction completed.
+
+A subsequent CI-verified code revision is
+[95b89e87aacacde7ec98aaf94f0188214a2d6dea](https://github.com/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/commit/95b89e87aacacde7ec98aaf94f0188214a2d6dea),
+which adds downloader retries. [CI run 8, attempt 2](https://github.com/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/actions/runs/42568209901) passed for that
+revision, including the `scientific-equivalence` job and one saved artifact. The
+run took 3 minutes 17 seconds; its Node.js 20 deprecation warning was not a
+failure. The downloaded [GitHub Actions build receipt](updated_verification/github_actions_build.json)
+records that CI result. The public launch record applies to the pinned `fe1dc89f49a4cd32c72283056d2b5e1ce29d362b` revision, not to every
+later commit. Direct numerical comparison with Evgenia's saved ESMValTool
+products and an interactive local Mac Jupyter browser test remain unverified.
+
+Binder sessions are temporary; save outputs and edited notebooks before leaving.
+Keep the working local environment available for the seminar. The old seminar
+and participant notebook sources are retained under the `legacy_` prefix, and
+older pinned launch links still identify those earlier code revisions.

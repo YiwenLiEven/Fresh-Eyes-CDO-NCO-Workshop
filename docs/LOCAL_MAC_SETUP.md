@@ -116,3 +116,33 @@ The local pytest 8.1.1 differs from the Binder manifest's version range. The loc
 environment is therefore a working demonstration environment, not a byte-for-byte
 copy of the Binder image. Do not copy its `.runtime` directory to another Mac;
 create an environment from the repository manifest instead.
+
+## Public Binder and Linux verification
+
+The updated code is published. GitHub Actions
+[run 42568209901, attempt 2](https://github.com/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/actions/runs/42568209901/attempts/2)
+passed the full Linux Binder build procedure on commit
+`95b89e87aacacde7ec98aaf94f0188214a2d6dea` in 3 minutes 17 seconds. Both
+notebooks executed through nbconvert; the participant notebook completed all ten
+code cells.
+
+A public BIDS Binder session was separately verified at commit
+`fe1dc89f49a4cd32c72283056d2b5e1ce29d362b`: the main notebook completed all eight
+cells in the browser and all ten real-data comparisons passed, with maximum
+difference 1.509903313490213e-14 °C. The comparison figure was visually checked.
+Its recorded versions are CDO 2.6.5, NCO 5.4.2 and Python 3.11.18. See
+`docs/binder_launch_verification_20261109.json` for the pinned launch URLs and
+observed details.
+
+The participant notebook also completed all ten code cells in the public Binder
+browser, reached 100% progress and returned to Idle with real 1979–2024 data.
+Its final hands-on cell passed the baseline-residual check at
+5.968558980384842e-14 °C and the alternate 70°N CDO/NCO regional-mean comparison
+at 3.019806626980426e-14 °C.
+
+The actual downloaded GitHub Actions artifact is retained under
+`outputs/github_actions_42568209901_attempt2/`. Its verification record is also
+copied to `docs/updated_verification/github_actions_build.json`, including the
+notebook source/executed hashes and the successful 8-cell and 10-cell executions.
+These remote checks are distinct from the local Mac checks above; interactive
+local Jupyter remains unverified.
