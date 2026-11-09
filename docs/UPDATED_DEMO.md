@@ -1,5 +1,19 @@
 # Updated CDO/NCO seminar: local use and Binder preparation
 
+## Audience layout: prepare once, teach CDO/NCO
+
+Step 01 is now a data card. The presenter runs the folded preparation and reference
+cells before the talk. They find and check the same input files and create a fresh
+output folder. Their Python source is available behind the ellipsis; participants
+do not need to read or edit it. All CDO/NCO `%%bash` cells remain expanded.
+
+The revision changes Markdown and visibility metadata only. Every executable
+cell source is identical to the previously tested version, with 8 main-notebook
+cells and 10 participant cells. Folded cells still run; do not delete or skip them
+when starting a fresh kernel. Use the latest `main` Binder link in README for this
+layout; an old commit-pinned URL will continue to display the old layout.
+
+
 Prepared 9 November 2026 for Yiwen Li's Fresh Eyes on CMIP contribution.
 All teaching material is in English. The two active notebooks are:
 

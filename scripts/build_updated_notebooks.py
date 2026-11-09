@@ -7,7 +7,12 @@ ROOT = Path(__file__).resolve().parents[1]
 N = ROOT / 'notebooks'
 
 def md(s): return nbf.v4.new_markdown_cell(s.strip())
-def code(s): return nbf.v4.new_code_cell(s.strip())
+def code(s, backstage=False):
+    cell = nbf.v4.new_code_cell(s.strip())
+    if backstage:
+        cell.metadata['jupyter'] = {'source_hidden': True}
+        cell.metadata['tags'] = ['infrastructure']
+    return cell
 
 def save(name, cells):
     path = N / name
@@ -17,6 +22,12 @@ def save(name, cells):
         'kernelspec': {'display_name':'Python 3 (ipykernel)','language':'python','name':'python3'},
         'language_info': {'name':'python','version':'3.11'},
     })
+    if path.exists():
+        previous = nbf.read(path, as_version=4)
+        if len(previous.cells) == len(nb.cells):
+            for old, new in zip(previous.cells, nb.cells):
+                if old.cell_type == new.cell_type:
+                    new['id'] = old.get('id', new['id'])
     nbf.write(nb, path)
 
 setup = '''from pathlib import Path
@@ -87,8 +98,8 @@ print("Ten product comparisons passed; inspect the report for coordinate, baseli
 figure='''display(Image(filename=str(RUN / "updated_comparison.png")))'''
 
 seminar=[
-md('''# Same climate calculation, three independent routes
-### Python · CDO-only · NCO-only — Yiwen Li / Fresh Eyes on CMIP
+md('''# Climate-data processing with CDO and NCO
+### Two independent command-line routes — Yiwen Li / Fresh Eyes on CMIP
 
 **20-minute prepared demonstration · updated 9 November 2026**
 
@@ -103,30 +114,37 @@ stop execution; the notebook never substitutes synthetic data.
 
 For an offline software test, explicitly choose `WORKSHOP_MODE=synthetic`.
 
-Run from top to bottom with **Shift+Enter**. Keep each `%%bash` header.
-Python validates and draws the final comparison; CDO and NCO each perform their
-own complete data processing from the same two raw inputs.
+**No Python knowledge is needed for this lesson.** Follow the visible CDO/NCO
+commands and their results. Setup, the independent Python reference, checks and
+plotting code are folded to keep the lesson focused; their outputs remain visible.
+
+Run every cell from top to bottom with **Shift+Enter**, including folded cells,
+or use **Run All**. Do not delete the folded cells. Click their ellipsis to reveal
+the code if you want to inspect it. Keep each `%%bash` header.
 '''),
-md('''## 01 · Choose the data and create a fresh run (0:00–2:00)
+md('''## 01 · Our data — already prepared (0:00–1:00)
 
-The default `DATA_MODE` is `real`. Set `WORKSHOP_MODE=synthetic` only for an
-explicit software test. The launch instructions also show how to supply local
-file paths. The processing scripts select the needed dates before loading
-arrays; the default run uses 552 months, not the full 1850–2100 archive.
-Keep `END_YEAR = 2024` for the shared seminar. **2100 is an optional scenario
-extension**, not the default comparison to Evgenia's 1979–2024 figures.
-'''),code(setup),md(contract),code(check),
-md('''## 03 · Python reference (2:00–5:00)
+| Our data | What we use |
+|---|---|
+| Model variable | ACCESS-CM2 monthly near-surface air temperature |
+| Historical file | 1850–2014 |
+| Future file | SSP5-8.5, 2015–2100 |
+| Today's analysis | 1979–2024: 552 months |
+| Monthly reference | 1981–2010 |
 
-xarray concatenates the historical and future records, selects 1979–2024,
-converts Kelvin to Celsius and groups the 1981–2010 reference by calendar month.
-It subtracts that reference from each matching month. The mean map uses
-`time_bnds` duration weights; the Arctic and annual reductions are arithmetic.
+**Presenter:** run the folded setup once before the talk. It selects the prepared
+files and creates a fresh results folder. Participants can simply run the cell;
+no Python editing is needed. The output confirms the data and analysis period.
+The full scenario to 2100 is an optional later exercise.
+'''),code(setup, backstage=True),md(contract),code(check, backstage=True),
+md('''## 03 · Reference result (prepared before the talk)
 
-This route reads the raw inputs directly. It does not prepare input for either
-command-line route. Open `scripts/run_python_updated.py` to inspect the full code.
-'''),code('''subprocess.run([sys.executable, "scripts/run_python_updated.py", str(HIST), str(FUTURE), str(RUN / "python"), "--end-year", str(END_YEAR)], check=True)'''),
-md('''## 04 · CDO-only route (5:00–9:00)
+An independent Python calculation provides the reference for our numerical
+checks. Its code runs backstage from the same raw files, using the definitions
+above. CDO and NCO each process those raw files themselves. Run this folded cell
+and check the completion message; we will focus on the command-line routes next.
+'''),code('''subprocess.run([sys.executable, "scripts/run_python_updated.py", str(HIST), str(FUTURE), str(RUN / "python"), "--end-year", str(END_YEAR)], check=True)''', backstage=True),
+md('''## 04 · CDO-only route (2:00–8:00)
 
 | Command | Meaning |
 |---|---|
@@ -151,7 +169,7 @@ The command below inspects the CDO result and changes no data.
 set -euo pipefail
 cdo -s ntime "$DEMO_OUT/cdo/climatology.nc"
 cdo -s showyear "$DEMO_OUT/cdo/arctic_annual.nc"'''),
-md('''## 05 · NCO-only route (9:00–13:30)
+md('''## 05 · NCO-only route (8:00–14:00)
 
 | Command | Meaning |
 |---|---|
@@ -170,14 +188,14 @@ No CDO output is read by this route.
 '''),code('''%%bash
 set -euo pipefail
 bash scripts/run_nco_updated.sh "$DEMO_HIST" "$DEMO_FUTURE" "$DEMO_OUT/nco" "$DEMO_END"'''),
-md('''## 06 · Numerical comparison (13:30–16:00)
+md('''## 06 · Numerical comparison (14:00–16:00)
 
 Compare **five products** from each command-line route against Python:
 monthly climatology, monthly anomaly fields, mean anomaly map, Arctic monthly
 series and annual series. This gives ten product comparisons. The checks also
 verify the baseline residual, time coverage, coordinates and equal-month annual
 means. Similar-looking figures alone would not establish numerical agreement.
-'''),code(validate),
+'''),code(validate, backstage=True),
 md('''## 07 · Interpret the outputs (16:00–18:30)
 
 Read each row across Python, CDO and NCO. Color limits are shared within the map
@@ -187,7 +205,7 @@ SSP5-8.5, not observations. Synthetic mode tests the software only.
 
 These checks establish agreement among the three implementations. A comparison
 with Evgenia's saved ESMValTool outputs is a separate verification step.
-'''),code(figure),
+'''),code(figure, backstage=True),
 md('''## 08 · Hands-on practice and saving results (18:30–20:00)
 
 Open [04_monthly_anomaly_hands_on.ipynb](04_monthly_anomaly_hands_on.ipynb).
@@ -210,14 +228,19 @@ This notebook runs independently from the seminar notebook. It uses the updated
 Both source files must be available. The Binder build caches them; the prepared
 Mac already has them. For an explicit software test only, choose
 `WORKSHOP_MODE=synthetic`. There is no automatic fallback.
-'''),md(contract),code(setup),code(check),
+
+No Python knowledge is required. The setup, checks and plotting helpers are
+folded; the CDO/NCO command cells and all outputs stay visible. Run folded cells
+with **Shift+Enter** or **Run All**, and do not delete them. Click an ellipsis only
+if you want to inspect the helper code.
+'''),md(contract),code(setup, backstage=True),code(check, backstage=True),
 md('''## 1 · Establish the reference result
 
 Run all three independent implementations once. Keep their common baseline,
 region and time weights fixed before exploring alternatives.
 '''),code('''%%bash
 set -euo pipefail
-bash scripts/run_updated_workflows.sh "$DEMO_HIST" "$DEMO_FUTURE" "$DEMO_OUT" "$DEMO_END"'''),code(figure),
+bash scripts/run_updated_workflows.sh "$DEMO_HIST" "$DEMO_FUTURE" "$DEMO_OUT" "$DEMO_END"'''),code(figure, backstage=True),
 md('''## 2 · Move the Arctic boundary to 70°N
 
 Prediction: should narrowing the region change the annual anomaly? The answer
@@ -240,7 +263,7 @@ with xr.open_dataset(RUN / "exercises/cdo_monthly_70N.nc") as a, xr.open_dataset
     np.testing.assert_allclose(cdo70, nco70, atol=0.0003, rtol=0)
     print("70°N CDO/NCO maximum difference:", float(abs(cdo70 - nco70).max()), "°C")
 with xr.open_dataset(RUN / "cdo/arctic_monthly.nc") as original:
-    print("70°N versus 65°N maximum difference:", float(abs(cdo70 - original.tas_anom.values.squeeze()).max()), "°C")'''),
+    print("70°N versus 65°N maximum difference:", float(abs(cdo70 - original.tas_anom.values.squeeze()).max()), "°C")''', backstage=True),
 md('''## 3 · Change the annual time weights only
 
 `yearmean` gives equal weight to each monthly sample. `yearmonmean` weights
@@ -254,7 +277,7 @@ cdo -O -s -b F64 -f nc yearmonmean "$DEMO_OUT/cdo/arctic_monthly.nc" \
     difference = weighted.tas_anom.values.squeeze() - equal.tas_anom.values.squeeze()
     print("Annual month-length weighting minus equal-month weighting:")
     print("Maximum absolute change:", float(abs(difference).max()), "°C")
-print("The shared recipe's annual result remains the original equal-month product.")'''),
+print("The shared recipe's annual result remains the original equal-month product.")''', backstage=True),
 md('''## 4 · Check the reference period residual
 
 For each grid point and calendar month, the average anomaly over 1981–2010
@@ -268,7 +291,7 @@ cdo -O -s -b F64 -f nc ymonmean "$DEMO_OUT/exercises/baseline_anomaly.nc" \
   "$DEMO_OUT/exercises/baseline_residual.nc"'''),code('''with xr.open_dataset(RUN / "exercises/baseline_residual.nc") as residual:
     maximum = float(abs(residual.tas_anom).max())
     assert maximum <= 0.0003
-    print("PASS: maximum reference-period monthly residual =", maximum, "°C")'''),
+    print("PASS: maximum reference-period monthly residual =", maximum, "°C")''', backstage=True),
 md('''## Optional extension · Continue the scenario to 2100
 
 Change `WORKSHOP_END_YEAR` (or `END_YEAR` in the setup cell) to `2100`, restart,

@@ -1,0 +1,21 @@
+{
+  "date": "2026-11-09",
+  "change": "Audience layout only: Markdown and input visibility",
+  "baseline_commit": "f1ea1013e0723b44797693e444b08e18beef9bb0",
+  "notebooks": {
+    "00_yl_20_minute_binder_demo.ipynb": {
+      "code_cell_count": 8,
+      "all_code_sources_unchanged": true,
+      "folded_support_cells": 5,
+      "shell_cells_visible": true,
+      "source_sha256": "23c620c64af065e944f462aad92c94a4063ccb305ad7d71cb85bdc602e6a17a2"
+    },
+    "04_monthly_anomaly_hands_on.ipynb": {
+      "code_cell_count": 10,
+      "all_code_sources_unchanged": true,
+      "folded_support_cells": 6,
+      "shell_cells_visible": true,
+      "source_sha256": "ec503973d4add4cc120bb069fc19b2927397c727db9d972dc1de7563949e9675"
+    }
+  }
+}

@@ -1,4 +1,4 @@
-# Fresh Eyes: Python, CDO-only and NCO-only
+# Fresh Eyes: climate analysis with CDO and NCO
 
 **Updated seminar · published 9 November 2026 · Yiwen Li**
 
@@ -18,14 +18,15 @@ only through an explicit `WORKSHOP_MODE=synthetic` software-test mode.
 - [Participant hands-on notebook](notebooks/04_monthly_anomaly_hands_on.ipynb)
 - [Local setup, real-data mode and scientific definitions](docs/UPDATED_DEMO.md)
 
-Recommended Binder links, pinned to the tested code revision:
+Open the latest audience layout (Python support cells folded; CDO/NCO commands visible):
 
-- [Open the 20-minute seminar in BIDS Binder](https://bids.mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/fe1dc89f49a4cd32c72283056d2b5e1ce29d362b?urlpath=lab/tree/notebooks/00_yl_20_minute_binder_demo.ipynb)
-- [Open participant practice in BIDS Binder](https://bids.mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/fe1dc89f49a4cd32c72283056d2b5e1ce29d362b?urlpath=lab/tree/notebooks/04_monthly_anomaly_hands_on.ipynb)
-- [Generic mybinder.org fallback](https://mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/fe1dc89f49a4cd32c72283056d2b5e1ce29d362b?urlpath=lab/tree/notebooks/00_yl_20_minute_binder_demo.ipynb)
+- [Open the 20-minute seminar in BIDS Binder](https://bids.mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/main?urlpath=lab/tree/notebooks/00_yl_20_minute_binder_demo.ipynb)
+- [Open participant practice in BIDS Binder](https://bids.mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/main?urlpath=lab/tree/notebooks/04_monthly_anomaly_hands_on.ipynb)
+- [Generic mybinder.org fallback](https://mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/main?urlpath=lab/tree/notebooks/00_yl_20_minute_binder_demo.ipynb)
 
-**The seminar notebook was rerun successfully in a live public BIDS Binder
-session.** All 8 code cells and ten product comparisons passed using real
+**The numerical code was tested in a live public BIDS Binder session.**
+The subsequent audience-layout update changes explanatory text and folds support
+code; all executable cell sources are unchanged. All 8 code cells and ten product comparisons passed using real
 ACCESS-CM2 data. Participant practice also passed all 10 cells after restarting
 its kernel and running all cells in the same public session. Both notebooks
 reached Idle / 100%. Save your results
@@ -40,6 +41,19 @@ jupyter lab notebooks/00_yl_20_minute_binder_demo.ipynb
 
 On the prepared Mac, the project-level `Launch_Updated_Notebook.command` uses the
 existing local CDO/NCO/Jupyter environment. No global shell changes are required.
+
+## Presenting to an audience without Python experience
+
+Before the talk, run the folded preparation, input-check and reference cells once
+(sections 01–03). Keep their source collapsed. Section 01 is a brief data card:
+ACCESS-CM2 monthly temperature, historical + SSP5-8.5, 1979–2024 analysis and an
+1981–2010 reference. There is no need to explain path handling or directory creation.
+
+During the talk, focus on sections 04–05 (CDO/NCO commands), then the numerical
+comparison and figures. Python support cells are folded by default; they still
+execute with Shift+Enter or Run All, and their output stays visible. Click the
+ellipsis only if you want to inspect implementation details. `%%bash` tells the
+notebook to execute shell commands; no Python programming is needed by participants.
 
 ## Common calculation
 
@@ -100,7 +114,7 @@ exercise (CDO/NCO maximum difference 3.019806626980426e-14°C) and its monthly
 reference-residual check (5.968558980384842e-14°C). See the
 [public launch record](docs/binder_launch_verification_20261109.json).
 
-The recommended links pin
+The earlier public session used
 [fe1dc89f49a4cd32c72283056d2b5e1ce29d362b](https://github.com/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/commit/fe1dc89f49a4cd32c72283056d2b5e1ce29d362b),
 the code revision tested in that public session. A subsequent CI-verified code
 revision is
