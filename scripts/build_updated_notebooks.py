@@ -2,6 +2,8 @@
 from pathlib import Path
 import shutil
 import nbformat as nbf
+from notebook_cdo_cells import CDO_STEPS
+from notebook_nco_cells import NCO_STEPS
 
 ROOT = Path(__file__).resolve().parents[1]
 N = ROOT / 'notebooks'
@@ -30,15 +32,16 @@ def save(name, cells):
                     new['id'] = old.get('id', new['id'])
     nbf.write(nb, path)
 
-setup = '''from pathlib import Path
+setup = '''# Select the data and create this run
+from pathlib import Path
 import os, sys, subprocess, json, uuid
 from datetime import datetime, timezone
 from IPython.display import display, Image
 
 ROOT = Path.cwd().resolve()
-if not (ROOT / "scripts/run_updated_workflows.sh").exists():
+if not (ROOT / "scripts/run_python_updated.py").exists():
     ROOT = ROOT.parent
-assert (ROOT / "scripts/run_updated_workflows.sh").exists(), "Open this notebook from the workshop repository."
+assert (ROOT / "scripts/run_python_updated.py").exists(), "Open this notebook from the workshop repository."
 os.chdir(ROOT)
 
 # The seminar uses real ACCESS-CM2. Synthetic mode is an explicit software-test option.
@@ -61,12 +64,18 @@ else:
 
 RUN = ROOT / "outputs" / ("updated_" + DATA_MODE + "_" + datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S") + "_" + uuid.uuid4().hex[:6])
 RUN.mkdir(parents=True)
+for route in ("cdo", "nco"):
+    directory = RUN / route
+    (directory / "work").mkdir(parents=True)
+    (directory / "historical_input.nc").symlink_to(HIST.resolve())
+    (directory / "ssp585_input.nc").symlink_to(FUTURE.resolve())
 os.environ.update(DEMO_HIST=os.path.relpath(HIST, ROOT), DEMO_FUTURE=os.path.relpath(FUTURE, ROOT), DEMO_OUT=os.path.relpath(RUN, ROOT), DEMO_END=str(END_YEAR))
 print("DATA MODE:", "SYNTHETIC SOFTWARE TEST — NOT ACCESS-CM2" if DATA_MODE == "synthetic" else "REAL ACCESS-CM2: historical + SSP5-8.5")
 print("Analysis:", f"1979–{END_YEAR}", "| Monthly reference: 1981–2010")
 print("Outputs:", RUN.relative_to(ROOT))
 '''
-check = '''subprocess.run([sys.executable, "scripts/check_updated_inputs.py", str(HIST), str(FUTURE), "--end-year", str(END_YEAR)], check=True)
+check = '''# Check data coverage and tool versions
+_ = subprocess.run([sys.executable, "scripts/check_updated_inputs.py", str(HIST), str(FUTURE), "--end-year", str(END_YEAR)], check=True)
 for command in (["cdo", "-V"], ["ncks", "--version"]):
     result = subprocess.run(command, check=True, text=True, capture_output=True)
     print((result.stdout + result.stderr).splitlines()[0])
@@ -84,163 +93,134 @@ contract = '''## 02 · The calculation we are comparing
 | Annual stripes | **Equal weight for the 12 monthly samples** in each year |
 | Comparison | Maximum absolute difference ≤ 0.0003°C, relative tolerance 0; coordinates and calendar labels agree |
 
-The map and annual series deliberately use different time weights. This follows
-`climate_statistics(period: full)` and `annual_statistics` in the updated
-ESMValTool recipe. Replacing both with the same averaging operator changes the task.
-The shared input check verifies matching grid, calendar and model/member metadata,
-complete months, full calendar-month time bounds and finite input values.
+The map weights each monthly field by its duration. The annual series gives
+each month equal weight. Keeping these definitions the same across tools makes
+the numerical comparison meaningful.
 '''
-validate='''subprocess.run([sys.executable, "scripts/compare_updated_workflows.py", str(RUN)], check=True)
+validate='''# Compare the three results
+subprocess.run([sys.executable, "scripts/compare_updated_workflows.py", str(RUN)], check=True)
 report = json.loads((RUN / "updated_validation.json").read_text())
 assert report["passed"]
 print("Maximum absolute difference (°C):", max(row["max_absolute_difference_degC"] for row in report["comparisons"].values()))
 print("Ten product comparisons passed; inspect the report for coordinate, baseline and annual checks.")'''
-figure='''display(Image(filename=str(RUN / "updated_comparison.png")))'''
+figure='''# Show the comparison figure
+display(Image(filename=str(RUN / "updated_comparison.png")))'''
+
+
+python_reference = '''# Calculate the independent reference
+_ = subprocess.run([sys.executable, "scripts/run_python_updated.py", str(HIST), str(FUTURE), str(RUN / "python"), "--end-year", str(END_YEAR)], check=True, capture_output=True, text=True)
+print(f"Reference ready: five products for 1979–{END_YEAR}.")
+'''
+
+def command_cells(route, steps, section):
+    cells = []
+    for number, (title, explanation, commands) in enumerate(steps, 1):
+        cells.append(md(f"### {section}.{number:02d} · {title}\n\n{explanation}"))
+        cells.append(code(f'%%bash\nset -euo pipefail\ncd "$DEMO_OUT/{route}"\n\n{commands.strip()}'))
+    return cells
+
+shell_intro = '''Each cell below contains the commands it executes. Use **Shift+Enter** to run
+one cell and inspect its result before continuing.
+
+- `%%bash` runs shell commands in this notebook.
+- `cd "$DEMO_OUT/cdo"` or `cd "$DEMO_OUT/nco"` enters that route's result folder.
+- `historical_input.nc` and `ssp585_input.nc` are short names for the two original files.
+- `$DEMO_END` is 2024; it can be changed for the optional extension.
+- `-O` permits replacing an output file when a cell is rerun. `set -euo pipefail`
+  stops a cell if a command fails.
+'''
 
 seminar=[
 md('''# Climate-data processing with CDO and NCO
-### Two independent command-line routes — Yiwen Li / Fresh Eyes on CMIP
+### Yiwen Li · Fresh Eyes on CMIP
 
-**20-minute prepared demonstration · updated 9 November 2026**
+Compute temperature anomalies, an Arctic time series and climate stripes from
+**ACCESS-CM2 historical + SSP5-8.5 monthly temperature**. Follow the CDO and NCO
+commands step by step, then compare their results with an independent Python calculation.
 
-Updated reference: [Evgenia Galytska's ESMValTool recipe](https://github.com/egalytska/Fresh_eyes/blob/040b9c7962355b1f8fa1312b7af867b458102b85/ESMValTool/recipe_temperature_anomalies.yml).
+The shared scientific definitions follow
+[Evgenia Galytska's ESMValTool recipe](https://github.com/egalytska/Fresh_eyes/blob/040b9c7962355b1f8fa1312b7af867b458102b85/ESMValTool/recipe_temperature_anomalies.yml).
 The [original Python workshop by Abhnil](https://github.com/abhnil/Fresh_Eyes_on_CMIP_Data_Workshop)
-provides the broader climate-data processing context.
+provides the broader workshop context.
 
-**Default: real ACCESS-CM2 historical + SSP5-8.5 output.** Both source files are
-cached during the Binder build and are already staged on the prepared Mac.
-The data mode is printed below and on the final figure. Missing real files
-stop execution; the notebook never substitutes synthetic data.
-
-For an offline software test, explicitly choose `WORKSHOP_MODE=synthetic`.
-
-**No Python knowledge is needed for this lesson.** Follow the visible CDO/NCO
-commands and their results. Setup, the independent Python reference, checks and
-plotting code are folded to keep the lesson focused; their outputs remain visible.
-
-Run every cell from top to bottom with **Shift+Enter**, including folded cells,
-or use **Run All**. Do not delete the folded cells. Click their ellipsis to reveal
-the code if you want to inspect it. Keep each `%%bash` header.
+Run the cells in order with **Shift+Enter**, including the collapsed cells.
 '''),
-md('''## 01 · Our data — already prepared (0:00–1:00)
+md('''## 01 · Data
 
-| Our data | What we use |
+| Item | Dataset |
 |---|---|
-| Model variable | ACCESS-CM2 monthly near-surface air temperature |
+| Model variable | ACCESS-CM2 monthly near-surface air temperature (`tas`, Kelvin) |
 | Historical file | 1850–2014 |
 | Future file | SSP5-8.5, 2015–2100 |
-| Today's analysis | 1979–2024: 552 months |
+| Analysis period | 1979–2024: 552 months |
 | Monthly reference | 1981–2010 |
 
-**Presenter:** run the folded setup once before the talk. It selects the prepared
-files and creates a fresh results folder. Participants can simply run the cell;
-no Python editing is needed. The output confirms the data and analysis period.
-The full scenario to 2100 is an optional later exercise.
+Run the next cell to select the data and create a new results folder.
 '''),code(setup, backstage=True),md(contract),code(check, backstage=True),
-md('''## 03 · Reference result (prepared before the talk)
+md('''## 03 · Reference calculation
 
-An independent Python calculation provides the reference for our numerical
-checks. Its code runs backstage from the same raw files, using the definitions
-above. CDO and NCO each process those raw files themselves. Run this folded cell
-and check the completion message; we will focus on the command-line routes next.
-'''),code('''subprocess.run([sys.executable, "scripts/run_python_updated.py", str(HIST), str(FUTURE), str(RUN / "python"), "--end-year", str(END_YEAR)], check=True)''', backstage=True),
-md('''## 04 · CDO-only route (2:00–8:00)
+The Python reference uses the same raw inputs and definitions. CDO and NCO
+will each process the original files independently. At the end, we will compare
+five products from each route.
+'''),code(python_reference, backstage=True),
+md('''## 04 · CDO: from monthly temperature to annual stripes
 
-| Command | Meaning |
-|---|---|
-| `selyear` → `mergetime` | Select the two experiment segments and join their months |
-| `subc,273.15` | Convert Kelvin to Celsius |
-| `selyear,1981/2010` → `ymonmean` | Create the 12 monthly reference fields |
-| `ymonsub` | Subtract the field for the corresponding calendar month |
-| `timsum -muldpm` divided by summed month lengths | Compute the duration-weighted mean map |
-| `sellonlatbox,0,360,65,90` → `fldmean,weights=false` | Select the Arctic and average grid points equally |
-| `yearmean` | Average the 12 monthly Arctic anomalies equally |
+CDO operators describe the operation applied to a NetCDF file. Most steps below
+write one new file, which becomes the input to the next step. `-b F64` retains
+double precision; `-f nc` writes classic NetCDF.
+'''),md(shell_intro),
+*command_cells('cdo', CDO_STEPS, '04'),
+md('''## 05 · NCO: the same calculation from the original data
 
-Read chained CDO operators from right to left. `-O` replaces generated outputs;
-`-b F64` requests double precision. Each run has its own output folder.
-'''),code('''%%bash
-set -euo pipefail
-bash scripts/run_cdo_updated.sh "$DEMO_HIST" "$DEMO_FUTURE" "$DEMO_OUT/cdo" "$DEMO_END"'''),
-md('''### Inspect one CDO step
+NCO uses separate commands for selecting, concatenating, calculating and
+averaging. Follow the filenames from one step to the next. This route reads the
+two original files and does not use the CDO results.
+'''),
+*command_cells('nco', NCO_STEPS, '05'),
+md('''## 06 · Compare the results
 
-The climatology has 12 fields, one per month; it is not a single reference mean.
-The command below inspects the CDO result and changes no data.
-'''),code('''%%bash
-set -euo pipefail
-cdo -s ntime "$DEMO_OUT/cdo/climatology.nc"
-cdo -s showyear "$DEMO_OUT/cdo/arctic_annual.nc"'''),
-md('''## 05 · NCO-only route (8:00–14:00)
-
-| Command | Meaning |
-|---|---|
-| `ncks` → `ncrcat` | Select historical/future records and concatenate them |
-| `ncap2` | Convert units and subtract the matching monthly reference |
-| `ncwa -d time,m,359,12` | Average one reference month across 30 years |
-| `ncecat` | Assemble the 12 separate reference fields |
-| `ncwa` with `time_bnds` duration weights | Create the weighted mean map |
-| `ncwa -a lat,lon -d lat,65.0,90.0` | Compute an unweighted Arctic monthly series |
-| `ncra --mro -d time,,,12,12` | Average consecutive groups of 12 months |
-
-NCO time indices are zero based. January uses 0, 12, …, 348; February starts at
-1. This bookkeeping requires January starts and complete consecutive years.
-Bash controls loops and filenames; the numerical operations remain in NCO.
-No CDO output is read by this route.
-'''),code('''%%bash
-set -euo pipefail
-bash scripts/run_nco_updated.sh "$DEMO_HIST" "$DEMO_FUTURE" "$DEMO_OUT/nco" "$DEMO_END"'''),
-md('''## 06 · Numerical comparison (14:00–16:00)
-
-Compare **five products** from each command-line route against Python:
-monthly climatology, monthly anomaly fields, mean anomaly map, Arctic monthly
-series and annual series. This gives ten product comparisons. The checks also
-verify the baseline residual, time coverage, coordinates and equal-month annual
-means. Similar-looking figures alone would not establish numerical agreement.
+Check **five products** from each command-line route against Python: monthly
+climatology, monthly anomaly fields, mean anomaly map, Arctic monthly series and
+annual series. These ten comparisons also check coordinates, the reference-period
+residual and the annual definition.
 '''),code(validate, backstage=True),
-md('''## 07 · Interpret the outputs (16:00–18:30)
+md('''## 07 · Read the figures
 
-Read each row across Python, CDO and NCO. Color limits are shared within the map
-row and within the stripe row. The first row is a period-mean anomaly, not a
-trend. Real mode is one model realization under historical forcing followed by
-SSP5-8.5, not observations. Synthetic mode tests the software only.
+Read each row across Python, CDO and NCO. The maps and stripes use shared color
+limits. The first row is a period-mean anomaly, not a trend. The inputs are one
+model realization under historical forcing followed by SSP5-8.5, not observations.
 
-These checks establish agreement among the three implementations. A comparison
-with Evgenia's saved ESMValTool outputs is a separate verification step.
+These checks compare the three implementations. A direct comparison with
+Evgenia's saved ESMValTool outputs is a separate check.
 '''),code(figure, backstage=True),
-md('''## 08 · Hands-on practice and saving results (18:30–20:00)
+md('''## 08 · Try a different region or period
 
 Open [04_monthly_anomaly_hands_on.ipynb](04_monthly_anomaly_hands_on.ipynb).
-Change one scientific choice at a time: Arctic boundary, monthly time weights,
-or the scenario end year. State which calculation changed before comparing plots.
+Change the Arctic boundary, annual time weights or scenario end year, one at a time.
 
-Your run folder contains each route's NetCDF outputs, `updated_validation.json`
-and `updated_comparison.png`. In Binder, download results and your edited notebook
-before leaving; the session is temporary. The older 1979–2014 notebooks are
-retained with the `legacy_` prefix for provenance.
+Each run folder contains NetCDF outputs, `updated_validation.json` and
+`updated_comparison.png`. Download your results and edited notebook before
+closing a Binder session.
 ''')]
 save('00_yl_20_minute_binder_demo.ipynb',seminar)
 
-practice=[md('''# Hands-on: choose one definition, predict the effect, then test it
-**Yiwen Li · Fresh Eyes on CMIP · updated 9 November 2026**
+practice=[md('''# Hands-on: temperature anomalies with CDO and NCO
+**Yiwen Li · Fresh Eyes on CMIP**
 
-This notebook runs independently from the seminar notebook. It uses the updated
-1979–2024 ESMValTool calculation and starts each route from the same raw data.
-**Default inputs are real ACCESS-CM2 historical + SSP5-8.5 output.**
-Both source files must be available. The Binder build caches them; the prepared
-Mac already has them. For an explicit software test only, choose
-`WORKSHOP_MODE=synthetic`. There is no automatic fallback.
+Use real ACCESS-CM2 historical + SSP5-8.5 data to reproduce the 1979–2024 result,
+then change one scientific choice at a time. This notebook runs independently.
 
-No Python knowledge is required. The setup, checks and plotting helpers are
-folded; the CDO/NCO command cells and all outputs stay visible. Run folded cells
-with **Shift+Enter** or **Run All**, and do not delete them. Click an ellipsis only
-if you want to inspect the helper code.
+Run every cell in order with **Shift+Enter**, including collapsed cells. All CDO
+and NCO processing commands are shown below their explanations.
 '''),md(contract),code(setup, backstage=True),code(check, backstage=True),
-md('''## 1 · Establish the reference result
+md('''## 1 · Reproduce the common result
 
-Run all three independent implementations once. Keep their common baseline,
-region and time weights fixed before exploring alternatives.
-'''),code('''%%bash
-set -euo pipefail
-bash scripts/run_updated_workflows.sh "$DEMO_HIST" "$DEMO_FUTURE" "$DEMO_OUT" "$DEMO_END"'''),code(figure, backstage=True),
+Keep the baseline, region and time weights fixed for the first calculation.
+The independent reference and both command-line routes start from the raw data.
+'''),code(python_reference, backstage=True),md(shell_intro),
+md('## 1A · CDO'),*command_cells('cdo', CDO_STEPS, '1A'),
+md('## 1B · NCO'),*command_cells('nco', NCO_STEPS, '1B'),
+md('## 1C · Compare the three routes'),code(validate, backstage=True),code(figure, backstage=True),
 md('''## 2 · Move the Arctic boundary to 70°N
 
 Prediction: should narrowing the region change the annual anomaly? The answer
@@ -304,4 +284,4 @@ Save your edited notebook, NetCDF outputs, validation report and figures before
 closing a Binder session. All outputs from this run are under the printed path.
 ''')]
 save('04_monthly_anomaly_hands_on.ipynb',practice)
-print('Wrote two updated notebooks; earlier notebooks retained as legacy copies.')
+print('Wrote two notebooks with inline CDO/NCO commands.')

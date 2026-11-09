@@ -1,0 +1,194 @@
+{
+  "date": "2026-11-09",
+  "scope": "Visible step-by-step CDO and NCO commands in the main and practice notebooks",
+  "execution_method": "IPython in-process including Bash cell magics; no live Jupyter browser or Binder verification of this revision",
+  "live_jupyter_verified": false,
+  "notebooks": [
+    {
+      "path": "notebooks/00_yl_20_minute_binder_demo.ipynb",
+      "sha256": "b8497025e01074e235ef1ab6a5ef46b5c9ff32007bb35e5a123cfc2699e73610",
+      "code_cells": 24,
+      "executed_cells": 24,
+      "bash_cells": 19,
+      "passed": true,
+      "all_cell_stderr_empty": true,
+      "checks": {
+        "no_presenter_preparation_labels": true,
+        "no_shell_script_wrappers": true,
+        "all_shell_cells_expanded": true
+      },
+      "validation": {
+        "input": {
+          "source_id": "ACCESS-CM2",
+          "variant_label": "r1i1p1f1",
+          "period": "1979-2024",
+          "baseline": "1981-2010",
+          "months": 552,
+          "years": 46,
+          "calendar": "proleptic_gregorian",
+          "time_units": "days since 1850-01-01",
+          "synthetic": false
+        },
+        "absolute_tolerance_degC": 0.0003,
+        "comparisons": {
+          "cdo/climatology": {
+            "max_absolute_difference_degC": 0.0,
+            "passed": true
+          },
+          "nco/climatology": {
+            "max_absolute_difference_degC": 0.0,
+            "passed": true
+          },
+          "cdo/anomaly": {
+            "max_absolute_difference_degC": 0.0,
+            "passed": true
+          },
+          "nco/anomaly": {
+            "max_absolute_difference_degC": 0.0,
+            "passed": true
+          },
+          "cdo/map_mean": {
+            "max_absolute_difference_degC": 0.0,
+            "passed": true
+          },
+          "nco/map_mean": {
+            "max_absolute_difference_degC": 0.0,
+            "passed": true
+          },
+          "cdo/arctic_monthly": {
+            "max_absolute_difference_degC": 3.552713678800501e-15,
+            "passed": true
+          },
+          "nco/arctic_monthly": {
+            "max_absolute_difference_degC": 2.6645352591003757e-15,
+            "passed": true
+          },
+          "cdo/arctic_annual": {
+            "max_absolute_difference_degC": 8.881784197001252e-16,
+            "passed": true
+          },
+          "nco/arctic_annual": {
+            "max_absolute_difference_degC": 4.440892098500626e-16,
+            "passed": true
+          }
+        },
+        "invariants": {
+          "python": {
+            "baseline_residual_degC": 5.968558980384842e-14,
+            "annual_equal_months": true,
+            "time_coverage": true,
+            "weighted_vs_arithmetic_map_difference_degC": 0.007861762999614247
+          },
+          "cdo": {
+            "baseline_residual_degC": 5.968558980384842e-14,
+            "annual_equal_months": true,
+            "time_coverage": true,
+            "annual_bounds_full_year": true,
+            "weighted_vs_arithmetic_map_difference_degC": 0.007861762999614247
+          },
+          "nco": {
+            "baseline_residual_degC": 5.968558980384842e-14,
+            "annual_equal_months": true,
+            "time_coverage": true,
+            "annual_bounds_full_year": true,
+            "weighted_vs_arithmetic_map_difference_degC": 0.007861762999614247
+          }
+        },
+        "passed": true
+      }
+    },
+    {
+      "path": "notebooks/04_monthly_anomaly_hands_on.ipynb",
+      "sha256": "8cdfdf34eb2c9b75a8a1b02b8eadc46db31540cf2141db2153759f0aace61e47",
+      "code_cells": 30,
+      "executed_cells": 30,
+      "bash_cells": 22,
+      "passed": true,
+      "all_cell_stderr_empty": true,
+      "checks": {
+        "no_presenter_preparation_labels": true,
+        "no_shell_script_wrappers": true,
+        "all_shell_cells_expanded": true
+      },
+      "validation": {
+        "input": {
+          "source_id": "ACCESS-CM2",
+          "variant_label": "r1i1p1f1",
+          "period": "1979-2024",
+          "baseline": "1981-2010",
+          "months": 552,
+          "years": 46,
+          "calendar": "proleptic_gregorian",
+          "time_units": "days since 1850-01-01",
+          "synthetic": false
+        },
+        "absolute_tolerance_degC": 0.0003,
+        "comparisons": {
+          "cdo/climatology": {
+            "max_absolute_difference_degC": 0.0,
+            "passed": true
+          },
+          "nco/climatology": {
+            "max_absolute_difference_degC": 0.0,
+            "passed": true
+          },
+          "cdo/anomaly": {
+            "max_absolute_difference_degC": 0.0,
+            "passed": true
+          },
+          "nco/anomaly": {
+            "max_absolute_difference_degC": 0.0,
+            "passed": true
+          },
+          "cdo/map_mean": {
+            "max_absolute_difference_degC": 0.0,
+            "passed": true
+          },
+          "nco/map_mean": {
+            "max_absolute_difference_degC": 0.0,
+            "passed": true
+          },
+          "cdo/arctic_monthly": {
+            "max_absolute_difference_degC": 3.552713678800501e-15,
+            "passed": true
+          },
+          "nco/arctic_monthly": {
+            "max_absolute_difference_degC": 2.6645352591003757e-15,
+            "passed": true
+          },
+          "cdo/arctic_annual": {
+            "max_absolute_difference_degC": 8.881784197001252e-16,
+            "passed": true
+          },
+          "nco/arctic_annual": {
+            "max_absolute_difference_degC": 4.440892098500626e-16,
+            "passed": true
+          }
+        },
+        "invariants": {
+          "python": {
+            "baseline_residual_degC": 5.968558980384842e-14,
+            "annual_equal_months": true,
+            "time_coverage": true,
+            "weighted_vs_arithmetic_map_difference_degC": 0.007861762999614247
+          },
+          "cdo": {
+            "baseline_residual_degC": 5.968558980384842e-14,
+            "annual_equal_months": true,
+            "time_coverage": true,
+            "annual_bounds_full_year": true,
+            "weighted_vs_arithmetic_map_difference_degC": 0.007861762999614247
+          },
+          "nco": {
+            "baseline_residual_degC": 5.968558980384842e-14,
+            "annual_equal_months": true,
+            "time_coverage": true,
+            "annual_bounds_full_year": true,
+            "weighted_vs_arithmetic_map_difference_degC": 0.007861762999614247
+          }
+        },
+        "passed": true
+      }
+    }
+  ]
+}
