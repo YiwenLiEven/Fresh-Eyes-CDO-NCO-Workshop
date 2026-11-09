@@ -23,13 +23,19 @@ temporary; download your edited notebook and results before leaving.
 1. Start at the first cell and use **Shift+Enter** to run each cell, including
    collapsed cells. Their output remains visible.
 2. Work through **nine CDO steps** and **ten NCO steps**. Both notebooks show
-   the actual commands in their `%%bash` cells: `cdo`, `ncks`, `ncap2`, `ncwa`
+   the actual commands in their `%%bash -e` cells: `cdo`, `ncks`, `ncap2`, `ncwa`
    and the other operators. Each step explains its input, output and options.
 3. Compare the results and view the maps, Arctic series and annual stripes.
    An independent Python calculation supplies the numerical reference; its
    support cells are collapsed by default.
 4. Use the practice notebook to explore the reference period and Arctic region.
-   After restarting the kernel, run from the first cell again.
+   To repeat the calculation, restart the kernel and run from the first cell.
+   Each full run creates a new output folder and keeps the previous results.
+
+Commands retain the options needed for the calculation. CDO uses `-b F64` once
+when joining the experiments, so temperatures are stored in double precision
+before arithmetic. NCO selects classic NetCDF once in its first historical
+extraction; subsequent products inherit that format.
 
 ## Common calculation
 
@@ -67,14 +73,21 @@ software-test option, with synthetic labels on its output.
 
 ## Verification by revision
 
-The current notebooks expose the processing commands in individual cells; their
-executable cell sources have changed. Local real-data checks completed **24/24
-main-notebook cells and 30/30 practice cells** using IPython in-process, including
-the Bash command cells. All ten product comparisons passed with a maximum
-absolute difference of **3.552713678800501e-15°C**; cell stderr streams were empty.
-See the [inline-command verification record](docs/inline_commands_verification_20261109.json).
-These checks verify the current cell code. A live Jupyter/Binder test of this
-new notebook revision remains to be recorded.
+The current revision simplifies the command options while preserving the
+scientific definitions and the 24-cell main / 30-cell practice structure.
+Local real-data checks completed **24/24 main cells and 30/30 practice cells**
+using IPython in-process, including the actual Bash command cells. All ten
+product comparisons passed, with maximum absolute difference
+**3.552713678800501e-15°C**, together with the coordinate, calendar and method
+checks. See the [simplified-command verification record](docs/simple_commands_verification_20261109.json).
+This verifies local cell execution; a live Jupyter/Binder run of this new
+revision remains to be recorded.
+
+The [earlier inline-command record](docs/inline_commands_verification_20261109.json)
+applies to revision `88d9fc0...`, before this option simplification. That version
+also passed its [Linux CI run](https://github.com/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/actions/runs/42585557534).
+Those results do not establish execution or live-browser verification of the
+current simplified commands.
 
 The [earlier public Binder record](docs/binder_launch_verification_20261109.json)
 verifies revision `fe1dc89...`, whose main and practice notebooks had **8 and 10

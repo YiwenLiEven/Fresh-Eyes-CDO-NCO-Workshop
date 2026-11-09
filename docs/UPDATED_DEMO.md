@@ -12,11 +12,12 @@ Each processing cell contains the CDO or NCO commands that it executes. Read the
 input, output and option explanations above each cell, run it, then continue to
 the next step. Both notebooks contain **nine CDO steps** and **ten NCO steps**.
 
-`%%bash` runs shell commands inside the notebook. The cell changes into that
+`%%bash -e` runs shell commands inside the notebook and stops the cell if a
+command fails. The cell changes into that
 route's output directory, where `historical_input.nc` and `ssp585_input.nc`
-refer to the original source files. `-O` permits replacing a step's previous
-output when it is rerun. If a command fails, that cell stops. After a kernel
-restart, run from the first cell so the data and output paths are established.
+refer to the original source files. To repeat the calculation, restart the
+kernel and run again from the first cell. Each full run creates a new output
+folder; earlier results remain in their original folder.
 
 Collapsed cells handle data checks, an independent Python reference and result
 display. They remain executable and their output is visible; no Python editing
@@ -34,6 +35,12 @@ is needed to follow the CDO/NCO calculations.
 | 8 | Arctic selection and equal-grid mean: `sellonlatbox`, `fldmean,weights=false` | Arctic zonal and meridional means: `ncwa` |
 | 9 | Equal-month annual mean: `yearmean` | Groups of 12 monthly records: `ncra --mro` |
 | 10 | — | Set full calendar-year time bounds: `ncks`, `ncap2` |
+
+CDO uses `-b F64` only on `mergetime`. This writes the joined temperatures in
+double precision before the first arithmetic operation, the Kelvin-to-Celsius
+conversion. Subsequent outputs inherit that precision, so the option does not
+need to be repeated. NCO uses `-3` only for the first historical extraction to
+choose classic NetCDF; the later derived products inherit that format.
 
 ## Source and scientific definitions
 
@@ -151,30 +158,35 @@ stripe color scale.
 
 ## Verification by revision
 
-The current revision expands processing into visible command cells. Its
-scientific definitions are unchanged, but its executable cell sources have
-changed. Local checks executed all **24 main-notebook cells and 30 practice
-cells** using the real ACCESS-CM2 historical and SSP5-8.5 files. Both notebooks
-passed all ten product comparisons, with maximum absolute difference
-**3.552713678800501e-15°C**, and their cell stderr streams were empty.
+The current revision simplifies the options in the visible command cells.
+The scientific definitions and the 24-cell main / 30-cell practice structure
+remain the same, but the executable commands have changed. Local real-data
+checks completed **24/24 main cells and 30/30 practice cells** using IPython
+in-process, including the actual Bash command cells. Both notebooks processed
+552 monthly fields and 46 annual values for 1979–2024. All ten product
+comparisons passed with maximum absolute difference **3.552713678800501e-15°C**,
+together with the coordinate, calendar, baseline, weighting and annual-definition
+checks.
 
-The checks used IPython in-process, including each actual Bash command cell.
-They verify the current cell code without a separate Jupyter kernel or browser
-session. The detailed evidence is
-[inline_commands_verification_20261109.json](inline_commands_verification_20261109.json).
-A live Jupyter/Binder check of this new revision remains to be recorded.
+The detailed evidence is
+[simple_commands_verification_20261109.json](simple_commands_verification_20261109.json).
+These are local in-process checks, without a separate Jupyter kernel or browser
+session. A live Jupyter/Binder run of this new simplified-command revision
+remains to be recorded.
 
 Earlier evidence remains available with its original scope:
 
 | Evidence | Revision and scope |
 | --- | --- |
+| [Earlier inline-command checks](inline_commands_verification_20261109.json) | `88d9fc0...`: 24/30-cell local in-process execution before the current option simplification |
+| [Earlier inline-command Linux CI](https://github.com/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/actions/runs/42585557534) | `88d9fc0...`: successful build and 24/30-cell execution before option simplification |
 | [Local notebook checks](UPDATED_NOTEBOOK_CHECKS.json) | Earlier notebooks with 8 main and 10 practice code cells, executed in-process on the Mac |
 | [Public Binder receipt](binder_launch_verification_20261109.json) | `fe1dc89...`: earlier 8/10-cell notebooks completed in the public Jupyter UI with real data |
 | [GitHub Actions build receipt](updated_verification/github_actions_build.json) | `95b89e8...`: full Linux build and earlier 8/10-cell notebook execution |
 | [Linux build record](updated_verification/linux_build.json) | Earlier Binder environment and notebook execution |
 | [Output compaction record](updated_verification/linux_compaction.json) | Earlier build's retained outputs and cleanup |
 
-Those earlier records do not verify the current inline-command notebook revision.
+Those earlier records do not verify the current simplified-command revision.
 Direct numerical agreement with Evgenia's saved ESMValTool products and an
 interactive local Mac Jupyter browser session remain separate, unverified checks.
 The earlier 1979–2014 notebook sources are retained under `notebooks/legacy_*.ipynb`.

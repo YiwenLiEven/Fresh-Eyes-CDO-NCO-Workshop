@@ -8,14 +8,14 @@ historical selection contains **432 months, 1979–2014**. For an end year of
 2024, the SSP5-8.5 selection contains **120 months, 2015–2024**.
 
 `-v` selects variables; `-d time,start,end` selects dates. `--mk_rec_dmn time`
-makes time the record dimension needed by `ncrcat`. `-3` writes classic NetCDF;
-`-O` replaces a previous output from this step. The outputs are
-`work/historical.nc` and `work/ssp585.nc`.''',
-        r'''ncks -O -3 --mk_rec_dmn time -v tas,time_bnds \
+makes time the record dimension needed by `ncrcat`. The first `-3` selects
+classic NetCDF; the merged file and later outputs inherit that format. The
+outputs are `work/historical.nc` and `work/ssp585.nc`.''',
+        r'''ncks -3 --mk_rec_dmn time -v tas,time_bnds \
   -d time,'1979-01-01','2014-12-31' \
   historical_input.nc work/historical.nc
 
-ncks -O -3 --mk_rec_dmn time -v tas,time_bnds \
+ncks --mk_rec_dmn time -v tas,time_bnds \
   -d time,'2015-01-01',"$DEMO_END-12-31" \
   ssp585_input.nc work/ssp585.nc''',
     ),
@@ -24,7 +24,7 @@ ncks -O -3 --mk_rec_dmn time -v tas,time_bnds \
         '''`ncrcat` concatenates records in the supplied order: historical
 first, then SSP5-8.5. `work/merged.nc` contains **552 consecutive monthly fields
 for 1979–2024**. No averaging occurs in this step.''',
-        r'''ncrcat -O work/historical.nc work/ssp585.nc work/merged.nc''',
+        r'''ncrcat work/historical.nc work/ssp585.nc work/merged.nc''',
     ),
     (
         'Convert Kelvin to Celsius',
@@ -37,12 +37,12 @@ double-precision value. The time bounds are complete, so their unused fill
 attribute is removed. The original `cell_measures` link refers to an external
 area file; it is removed because these spatial means use equal grid-point
 weights. These attribute edits do not change the valid temperature values.''',
-        r'''ncap2 -O -s '
+        r'''ncap2 -s '
   tas=double(tas)-273.15;
   tas@units="degC";
 ' work/merged.nc work/celsius.nc
 
-ncatted -O \
+ncatted \
   -a _FillValue,tas,o,d,1.0e20 \
   -a missing_value,tas,o,d,1.0e20 \
   -a _FillValue,time_bnds,d,, \
@@ -54,7 +54,7 @@ ncatted -O \
         '''The reference is taken from the historical years in
 `work/celsius.nc`. `work/baseline.nc` contains **360 consecutive months**,
 starting in January 1981 and ending in December 2010.''',
-        r'''ncks -O -d time,'1981-01-01','2010-12-31' \
+        r'''ncks -d time,'1981-01-01','2010-12-31' \
   work/celsius.nc work/baseline.nc''',
     ),
     (
@@ -64,23 +64,23 @@ starting in January 1981 and ending in December 2010.''',
 February starts at index 1; the loop continues through December at index 11.
 
 `ncwa -a time` takes an arithmetic mean and removes the time dimension.
-`ncecat -u month` then joins the twelve fields into `climatology.nc`, preserving
-January-to-December order. The final command labels the month coordinate
-**1–12**. `month_files` holds only the twelve filenames.''',
+`ncecat -u month` joins the twelve fields in January-to-December order.
+`ncap2` adds month labels **1–12** and writes the final `climatology.nc`.
+`month_files` holds only the twelve filenames.''',
         r'''month_files=()
 for m in {0..11}; do
   printf -v tag '%02d' "$m"
-  ncwa -O -a time -d time,"$m",359,12 \
+  ncwa -a time -d time,"$m",359,12 \
     work/baseline.nc "work/clim_$tag.nc"
   month_files+=("work/clim_$tag.nc")
 done
 
-ncecat -O -u month "${month_files[@]}" climatology.nc
+ncecat -u month "${month_files[@]}" work/climatology_unlabelled.nc
 
-ncap2 -O -s '
+ncap2 -s '
   month[month]=array(1,1,$month);
   month@long_name="calendar month";
-' climatology.nc climatology.nc''',
+' work/climatology_unlabelled.nc climatology.nc''',
     ),
     (
         'Subtract the matching calendar-month reference',
@@ -93,11 +93,11 @@ The input starts in January and contains consecutive complete months. Therefore
 `t%12` identifies the corresponding zero-based reference month for every time
 index `t`. `ncap2` subtracts that reference at every latitude and longitude.
 `anomaly.nc` retains **552 monthly anomaly fields** and their time bounds.''',
-        r'''ncrename -O -v tas,tas_clim climatology.nc work/clim_named.nc
-ncks -O --fix_rec_dmn month work/clim_named.nc work/clim_fixed.nc
+        r'''ncrename -v tas,tas_clim climatology.nc work/clim_named.nc
+ncks --fix_rec_dmn month work/clim_named.nc work/clim_fixed.nc
 ncks -A -v tas_clim work/clim_fixed.nc work/celsius.nc
 
-ncap2 -O -s '
+ncap2 -s '
   tas_anom=tas;
   for(t=0;t<$time.size;t++){
     tas_anom(t,:,:)=tas(t,:,:)-tas_clim(t%12,:,:);
@@ -106,7 +106,7 @@ ncap2 -O -s '
   tas_anom@anomaly_reference_period="1981-2010";
 ' work/celsius.nc work/anomaly_all.nc
 
-ncks -O -v tas_anom,time_bnds work/anomaly_all.nc anomaly.nc''',
+ncks -v tas_anom,time_bnds work/anomaly_all.nc anomaly.nc''',
     ),
     (
         'Calculate the duration-weighted mean anomaly map',
@@ -116,11 +116,11 @@ duration in the file's time units. `ncwa -a time -w duration` computes
 
 `map_mean.nc` contains one latitude–longitude field. The map follows the
 recipe's duration weighting and is a period-mean anomaly, not a trend.''',
-        r'''ncap2 -O -s '
+        r'''ncap2 -s '
   duration[time]=double(time_bnds(:,1)-time_bnds(:,0));
 ' anomaly.nc work/weighted.nc
 
-ncwa -O -a time -w duration -v tas_anom \
+ncwa -a time -w duration -v tas_anom \
   work/weighted.nc map_mean.nc''',
     ),
     (
@@ -131,10 +131,10 @@ meridional mean. No area weights are supplied, matching the recipe's arithmetic
 spatial means.
 
 `arctic_monthly.nc` contains **552 monthly Arctic anomalies**.''',
-        r'''ncwa -O -a lon -d lat,65.0,90.0 \
+        r'''ncwa -a lon -d lat,65.0,90.0 \
   anomaly.nc work/arctic_zonal.nc
 
-ncwa -O -a lat work/arctic_zonal.nc arctic_monthly.nc''',
+ncwa -a lat work/arctic_zonal.nc arctic_monthly.nc''',
     ),
     (
         'Calculate annual Arctic anomalies',
@@ -145,10 +145,10 @@ group both contain twelve records: January–December of each year.
 `arctic_annual.nc` contains **46 annual values, 1979–2024**. Each monthly sample
 has equal weight. This annual definition deliberately differs from the
 duration-weighted map.''',
-        r'''ncks -O --mk_rec_dmn time \
+        r'''ncks --mk_rec_dmn time \
   arctic_monthly.nc work/arctic_record.nc
 
-ncra -O --mro -d time,,,12,12 \
+ncra --mro -d time,,,12,12 \
   work/arctic_record.nc arctic_annual.nc''',
     ),
     (
@@ -161,16 +161,16 @@ The first selection takes records **0, 12, 24, …**; the second takes records
 **11, 23, 35, …**. `-C -v` copies only the named variable, so the annual time
 coordinate is preserved. The final file has **46 complete calendar-year
 intervals**.''',
-        r'''ncks -O -v time_bnds -d time,0,,12 \
+        r'''ncks -v time_bnds -d time,0,,12 \
   work/arctic_record.nc work/year_starts.nc
-ncks -O -v time_bnds -d time,11,,12 \
+ncks -v time_bnds -d time,11,,12 \
   work/arctic_record.nc work/year_ends.nc
 
-ncap2 -O -s 'year_end[time]=time_bnds(:,1);' \
+ncap2 -s 'year_end[time]=time_bnds(:,1);' \
   work/year_ends.nc work/year_ends_named.nc
 ncks -A -C -v year_end work/year_ends_named.nc work/year_starts.nc
 
-ncap2 -O -s 'time_bnds(:,1)=year_end;' \
+ncap2 -s 'time_bnds(:,1)=year_end;' \
   work/year_starts.nc work/year_bounds.nc
 ncks -A -C -v time_bnds work/year_bounds.nc arctic_annual.nc''',
     ),

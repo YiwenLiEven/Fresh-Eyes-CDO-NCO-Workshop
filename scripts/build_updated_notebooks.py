@@ -116,18 +116,19 @@ def command_cells(route, steps, section):
     cells = []
     for number, (title, explanation, commands) in enumerate(steps, 1):
         cells.append(md(f"### {section}.{number:02d} · {title}\n\n{explanation}"))
-        cells.append(code(f'%%bash\nset -euo pipefail\ncd "$DEMO_OUT/{route}"\n\n{commands.strip()}'))
+        cells.append(code(f'%%bash -e\ncd "$DEMO_OUT/{route}"\n\n{commands.strip()}'))
     return cells
 
 shell_intro = '''Each cell below contains the commands it executes. Use **Shift+Enter** to run
 one cell and inspect its result before continuing.
 
-- `%%bash` runs shell commands in this notebook.
+- `%%bash -e` runs shell commands and stops the cell if a command fails.
 - `cd "$DEMO_OUT/cdo"` or `cd "$DEMO_OUT/nco"` enters that route's result folder.
 - `historical_input.nc` and `ssp585_input.nc` are short names for the two original files.
 - `$DEMO_END` is 2024; it can be changed for the optional extension.
-- `-O` permits replacing an output file when a cell is rerun. `set -euo pipefail`
-  stops a cell if a command fails.
+
+To repeat the calculation, run from the first cell again to create a new results
+folder. The commands write new files without overwrite options.
 '''
 
 seminar=[
@@ -166,8 +167,8 @@ five products from each route.
 md('''## 04 · CDO: from monthly temperature to annual stripes
 
 CDO operators describe the operation applied to a NetCDF file. Most steps below
-write one new file, which becomes the input to the next step. `-b F64` retains
-double precision; `-f nc` writes classic NetCDF.
+write one new file, which becomes the input to the next step:
+`cdo operation input.nc output.nc`.
 '''),md(shell_intro),
 *command_cells('cdo', CDO_STEPS, '04'),
 md('''## 05 · NCO: the same calculation from the original data
@@ -227,14 +228,13 @@ Prediction: should narrowing the region change the annual anomaly? The answer
 depends on the spatial structure of the data. These commands use each route's
 own anomaly file. They retain equal grid-point weights and equal monthly weights.
 Only the latitude threshold changes.
-'''),code('''%%bash
-set -euo pipefail
+'''),code('''%%bash -e
 mkdir -p "$DEMO_OUT/exercises"
-cdo -O -L -s -b F64 -f nc sellonlatbox,0,360,70,90 \
+cdo sellonlatbox,0,360,70,90 \
   "$DEMO_OUT/cdo/anomaly.nc" "$DEMO_OUT/exercises/cdo_arctic_70N.nc"
-cdo -O -L -s -b F64 -f nc fldmean,weights=false \
+cdo fldmean,weights=false \
   "$DEMO_OUT/exercises/cdo_arctic_70N.nc" "$DEMO_OUT/exercises/cdo_monthly_70N.nc"
-ncwa -O -a lat,lon -d lat,70.0,90.0 \
+ncwa -a lat,lon -d lat,70.0,90.0 \
   "$DEMO_OUT/nco/anomaly.nc" "$DEMO_OUT/exercises/nco_monthly_70N.nc"'''),code('''import numpy as np
 import xarray as xr
 with xr.open_dataset(RUN / "exercises/cdo_monthly_70N.nc") as a, xr.open_dataset(RUN / "exercises/nco_monthly_70N.nc") as b:
@@ -250,9 +250,8 @@ md('''## 3 · Change the annual time weights only
 monthly values by the number of days in each month. The latter is a valid
 alternative question, but it changes the annual definition in the shared recipe.
 Keep the Arctic boundary at 65°N while testing this difference.
-'''),code('''%%bash
-set -euo pipefail
-cdo -O -s -b F64 -f nc yearmonmean "$DEMO_OUT/cdo/arctic_monthly.nc" \
+'''),code('''%%bash -e
+cdo yearmonmean "$DEMO_OUT/cdo/arctic_monthly.nc" \
   "$DEMO_OUT/exercises/cdo_annual_monthlength.nc"'''),code('''with xr.open_dataset(RUN / "exercises/cdo_annual_monthlength.nc") as weighted, xr.open_dataset(RUN / "cdo/arctic_annual.nc") as equal:
     difference = weighted.tas_anom.values.squeeze() - equal.tas_anom.values.squeeze()
     print("Annual month-length weighting minus equal-month weighting:")
@@ -263,11 +262,10 @@ md('''## 4 · Check the reference period residual
 For each grid point and calendar month, the average anomaly over 1981–2010
 should be close to zero. This checks the month matching, not whether all
 1979–2024 anomalies average to zero.
-'''),code('''%%bash
-set -euo pipefail
-cdo -O -s -b F64 -f nc selyear,1981/2010 "$DEMO_OUT/cdo/anomaly.nc" \
+'''),code('''%%bash -e
+cdo selyear,1981/2010 "$DEMO_OUT/cdo/anomaly.nc" \
   "$DEMO_OUT/exercises/baseline_anomaly.nc"
-cdo -O -s -b F64 -f nc ymonmean "$DEMO_OUT/exercises/baseline_anomaly.nc" \
+cdo ymonmean "$DEMO_OUT/exercises/baseline_anomaly.nc" \
   "$DEMO_OUT/exercises/baseline_residual.nc"'''),code('''with xr.open_dataset(RUN / "exercises/baseline_residual.nc") as residual:
     maximum = float(abs(residual.tas_anom).max())
     assert maximum <= 0.0003
