@@ -4,7 +4,9 @@ set -euo pipefail
 input=${1:-data/demo/tas_demo.nc}
 out=${2:-outputs/demo/monthly/nco}
 mkdir -p "$out/work"
-ncks -O -v tas -d time,'1979-01-01','2014-12-31' "$input" "$out/work/selected.nc"
+# NetCDF4 permits both the existing unlimited time axis and the climatology
+# month axis appended below, including when the raw organizer file is NetCDF3.
+ncks -4 -O -v tas -d time,'1979-01-01','2014-12-31' "$input" "$out/work/selected.nc"
 ncap2 -O -s 'tas=double(tas)-273.15;tas@units="degC";' "$out/work/selected.nc" "$out/work/celsius.nc"
 # The shared input contract rejects missing values. A finite common sentinel
 # also avoids NaN-vs-NaN metadata warnings in NCO arithmetic.

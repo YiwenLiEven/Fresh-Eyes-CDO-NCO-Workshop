@@ -6,5 +6,10 @@ __pycache__/
 data/raw/
 data/work/
 data/demo/
+data/access_cm2/
+data/updated_fixture/
+.local-cache/
+.cache/
+.runtime/
 outputs/*
 !outputs/.gitkeep

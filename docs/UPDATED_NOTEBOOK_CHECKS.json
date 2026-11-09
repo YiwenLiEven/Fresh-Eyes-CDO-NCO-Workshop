@@ -1,0 +1,88 @@
+{
+  "date": "2026-11-09",
+  "platform": "macOS / Apple Silicon with existing x86_64 Conda runtime via Rosetta",
+  "versions": {
+    "cdo": "2.5.0",
+    "nco": "5.3.9",
+    "python": "3.12.14"
+  },
+  "notebooks": [
+    {
+      "notebook": "notebooks/00_yl_20_minute_binder_demo.ipynb",
+      "execution_method": "IPython in-process; no Jupyter kernel, browser or Binder session",
+      "live_jupyter_verified": false,
+      "passed": true,
+      "elapsed_seconds": 23.917309045791626,
+      "notebook_sha256": "d3b174b1bed5e897728ad6d5caf1b9dbc067fc23cd522aed2e3fb5967c66428e",
+      "code_cells": 8,
+      "stderr_cells": 0,
+      "data_mode": "real ACCESS-CM2 historical + SSP5-8.5",
+      "period": "1979-2024",
+      "product_comparisons": 10,
+      "maximum_difference_degC": 3.552713678800501e-15,
+      "invariants": {
+        "python": {
+          "baseline_residual_degC": 5.968558980384842e-14,
+          "annual_equal_months": true,
+          "time_coverage": true,
+          "weighted_vs_arithmetic_map_difference_degC": 0.007861762999614247
+        },
+        "cdo": {
+          "baseline_residual_degC": 5.968558980384842e-14,
+          "annual_equal_months": true,
+          "time_coverage": true,
+          "annual_bounds_full_year": true,
+          "weighted_vs_arithmetic_map_difference_degC": 0.007861762999614247
+        },
+        "nco": {
+          "baseline_residual_degC": 5.968558980384842e-14,
+          "annual_equal_months": true,
+          "time_coverage": true,
+          "annual_bounds_full_year": true,
+          "weighted_vs_arithmetic_map_difference_degC": 0.007861762999614247
+        }
+      }
+    },
+    {
+      "notebook": "notebooks/04_monthly_anomaly_hands_on.ipynb",
+      "execution_method": "IPython in-process; no Jupyter kernel, browser or Binder session",
+      "live_jupyter_verified": false,
+      "passed": true,
+      "elapsed_seconds": 25.474575996398926,
+      "notebook_sha256": "cd9ffcf2b2092e9c724a1a2e2a949cc0e448e61192323afe984fc4d52ea73730",
+      "code_cells": 10,
+      "stderr_cells": 0,
+      "data_mode": "real ACCESS-CM2 historical + SSP5-8.5",
+      "period": "1979-2024",
+      "product_comparisons": 10,
+      "maximum_difference_degC": 3.552713678800501e-15,
+      "invariants": {
+        "python": {
+          "baseline_residual_degC": 5.968558980384842e-14,
+          "annual_equal_months": true,
+          "time_coverage": true,
+          "weighted_vs_arithmetic_map_difference_degC": 0.007861762999614247
+        },
+        "cdo": {
+          "baseline_residual_degC": 5.968558980384842e-14,
+          "annual_equal_months": true,
+          "time_coverage": true,
+          "annual_bounds_full_year": true,
+          "weighted_vs_arithmetic_map_difference_degC": 0.007861762999614247
+        },
+        "nco": {
+          "baseline_residual_degC": 5.968558980384842e-14,
+          "annual_equal_months": true,
+          "time_coverage": true,
+          "annual_bounds_full_year": true,
+          "weighted_vs_arithmetic_map_difference_degC": 0.007861762999614247
+        }
+      }
+    }
+  ],
+  "input_hashes": {
+    "historical": "3e106e8430f04cd2b260a7230b1e461ccebdda338d09e3f07e8497678c5c6f0f",
+    "ssp585": "8f0d0cee4c370c0c30acc31ef6bf03a2592ee3dfd827a13e37716cd7484909b1"
+  },
+  "limitation": "A normal Jupyter kernel could not bind a socket in the execution sandbox. These checks executed the notebook cells with IPython in-process, including Bash magics. They do not verify a live Jupyter UI, GitHub publication, a fresh Binder build or agreement with Evgenia saved ESMValTool outputs."
+}

@@ -1,0 +1,33 @@
+{
+  "notebook_runs_compacted": [
+    "outputs/updated_real_20261109T051956_585e3c",
+    "outputs/updated_real_20261109T052141_a7c990"
+  ],
+  "notebook_netcdf_files_removed": 124,
+  "work_directories_removed": [
+    "outputs/updated_real_build/cdo/work",
+    "outputs/updated_real_build/nco/work",
+    "outputs/updated_build/cdo/work",
+    "outputs/updated_build/nco/work"
+  ],
+  "bytes_removed_including_symlink_entries": 8184938910,
+  "main_final_netcdf_files_retained": [
+    "outputs/updated_real_build/python/climatology.nc",
+    "outputs/updated_real_build/python/anomaly.nc",
+    "outputs/updated_real_build/python/map_mean.nc",
+    "outputs/updated_real_build/python/arctic_monthly.nc",
+    "outputs/updated_real_build/python/arctic_annual.nc",
+    "outputs/updated_real_build/cdo/climatology.nc",
+    "outputs/updated_real_build/cdo/anomaly.nc",
+    "outputs/updated_real_build/cdo/map_mean.nc",
+    "outputs/updated_real_build/cdo/arctic_monthly.nc",
+    "outputs/updated_real_build/cdo/arctic_annual.nc",
+    "outputs/updated_real_build/nco/climatology.nc",
+    "outputs/updated_real_build/nco/anomaly.nc",
+    "outputs/updated_real_build/nco/map_mean.nc",
+    "outputs/updated_real_build/nco/arctic_monthly.nc",
+    "outputs/updated_real_build/nco/arctic_annual.nc"
+  ],
+  "raw_inputs_preserved": true,
+  "reports_figures_and_executed_notebooks_preserved": true
+}

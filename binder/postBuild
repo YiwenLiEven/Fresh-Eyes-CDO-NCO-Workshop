@@ -4,7 +4,17 @@ set -euo pipefail
 python -m pip install --no-deps -e .
 python scripts/generate_demo_data.py --output data/demo/tas_demo.nc
 bash scripts/run_all.sh data/demo/tas_demo.nc outputs/demo
+python scripts/generate_updated_fixture.py data/updated_fixture
+bash scripts/run_updated_workflows.sh data/updated_fixture/historical.nc data/updated_fixture/ssp585.nc outputs/updated_build 2024
 python -m pytest -q
+# Cache the two hash-verified real inputs in the Binder image. A download failure
+# fails the build; the seminar must never silently fall back to synthetic data.
+python scripts/fetch_updated_data.py
+bash scripts/run_updated_workflows.sh \
+  data/access_cm2/tas_Amon_ACCESS-CM2_historical_r1i1p1f1_gn_185001-201412.nc \
+  data/access_cm2/tas_Amon_ACCESS-CM2_ssp585_r1i1p1f1_gn_201501-210012.nc \
+  outputs/updated_real_build 2024
+export WORKSHOP_MODE=real
 mkdir -p outputs/executed
 jupyter nbconvert --to notebook --execute \
   notebooks/00_yl_20_minute_binder_demo.ipynb \
@@ -13,5 +23,7 @@ jupyter nbconvert --to notebook --execute \
   notebooks/04_monthly_anomaly_hands_on.ipynb \
   --output-dir outputs/executed --ExecutePreprocessor.timeout=600
 python scripts/write_verification_report.py
+python scripts/compact_binder_outputs.py
 
-echo "Binder workshop environment is ready."
+echo "Binder workshop ready: real ACCESS-CM2 historical + SSP585, 1979-2024."
+echo "Synthetic regression tests and both real-data seminar notebooks passed."

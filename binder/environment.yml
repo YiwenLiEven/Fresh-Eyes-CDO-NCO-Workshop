@@ -9,10 +9,12 @@ dependencies:
   - ipykernel>=6.29
   - jupyterlab>=4.2,<5
   - nbconvert>=7.16,<8
+  - nbclient
+  - nbformat
   - matplotlib>=3.9,<4
   - netcdf4>=1.7
   - numpy>=2,<3
   - pandas>=2.2,<3
   - pytest>=8.3,<9
-  - xarray>=2024.7
+  - xarray>=2025.1
   - pip

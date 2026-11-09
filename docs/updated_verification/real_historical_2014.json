@@ -1,0 +1,42 @@
+{
+  "cdo_vs_python/monthly": {
+    "max_absolute_difference_degC": 2.593994140909217e-05,
+    "absolute_tolerance_degC": 0.0003,
+    "passed": true
+  },
+  "nco_vs_python/monthly": {
+    "max_absolute_difference_degC": 2.5939941352248752e-05,
+    "absolute_tolerance_degC": 0.0003,
+    "passed": true
+  },
+  "cdo_vs_python/map": {
+    "max_absolute_difference_degC": 2.010685426348524e-05,
+    "absolute_tolerance_degC": 0.0003,
+    "passed": true
+  },
+  "nco_vs_python/map": {
+    "max_absolute_difference_degC": 2.0105971194450678e-05,
+    "absolute_tolerance_degC": 0.0003,
+    "passed": true
+  },
+  "cdo_vs_python/arctic_monthly": {
+    "max_absolute_difference_degC": 1.2953347265476367e-05,
+    "absolute_tolerance_degC": 0.0003,
+    "passed": true
+  },
+  "nco_vs_python/arctic_monthly": {
+    "max_absolute_difference_degC": 1.2866126160027136e-05,
+    "absolute_tolerance_degC": 0.0003,
+    "passed": true
+  },
+  "cdo_vs_python/arctic_annual": {
+    "max_absolute_difference_degC": 5.436061225272404e-06,
+    "absolute_tolerance_degC": 0.0003,
+    "passed": true
+  },
+  "nco_vs_python/arctic_annual": {
+    "max_absolute_difference_degC": 5.534843160903691e-06,
+    "absolute_tolerance_degC": 0.0003,
+    "passed": true
+  }
+}

@@ -1,0 +1,7 @@
+........                                                                 [100%]
+=============================== warnings summary ===============================
+tests/test_monthly_reference.py::test_monthly_reference_matches_calendar_and_arctic_definition
+  <frozen importlib._bootstrap>:488: RuntimeWarning: numpy.ndarray size changed, may indicate binary incompatibility. Expected 16 from C header, got 96 from PyObject
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+8 passed, 1 warning in 7.22s

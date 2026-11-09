@@ -1,0 +1,89 @@
+{
+  "input": {
+    "source_id": "ACCESS-CM2",
+    "variant_label": "r1i1p1f1",
+    "period": "1979-2100",
+    "baseline": "1981-2010",
+    "months": 1464,
+    "years": 122,
+    "calendar": "proleptic_gregorian",
+    "time_units": "days since 1850-01-01",
+    "synthetic": false
+  },
+  "absolute_tolerance_degC": 0.0003,
+  "comparisons": {
+    "cdo/climatology": {
+      "max_absolute_difference_degC": 0.0,
+      "passed": true
+    },
+    "nco/climatology": {
+      "max_absolute_difference_degC": 0.0,
+      "passed": true
+    },
+    "cdo/anomaly": {
+      "max_absolute_difference_degC": 0.0,
+      "passed": true
+    },
+    "nco/anomaly": {
+      "max_absolute_difference_degC": 0.0,
+      "passed": true
+    },
+    "cdo/map_mean": {
+      "max_absolute_difference_degC": 0.0,
+      "passed": true
+    },
+    "nco/map_mean": {
+      "max_absolute_difference_degC": 0.0,
+      "passed": true
+    },
+    "cdo/arctic_monthly": {
+      "max_absolute_difference_degC": 2.4868995751603507e-14,
+      "passed": true
+    },
+    "nco/arctic_monthly": {
+      "max_absolute_difference_degC": 1.0658141036401503e-14,
+      "passed": true
+    },
+    "cdo/arctic_annual": {
+      "max_absolute_difference_degC": 5.329070518200751e-15,
+      "passed": true
+    },
+    "nco/arctic_annual": {
+      "max_absolute_difference_degC": 3.552713678800501e-15,
+      "passed": true
+    }
+  },
+  "invariants": {
+    "python": {
+      "baseline_residual_degC": 5.968558980384842e-14,
+      "annual_equal_months": true,
+      "time_coverage": true,
+      "weighted_vs_arithmetic_map_difference_degC": 0.02588164206680421
+    },
+    "cdo": {
+      "baseline_residual_degC": 5.968558980384842e-14,
+      "annual_equal_months": true,
+      "time_coverage": true,
+      "annual_bounds_full_year": true,
+      "weighted_vs_arithmetic_map_difference_degC": 0.02588164206680421
+    },
+    "nco": {
+      "baseline_residual_degC": 5.968558980384842e-14,
+      "annual_equal_months": true,
+      "time_coverage": true,
+      "annual_bounds_full_year": true,
+      "weighted_vs_arithmetic_map_difference_degC": 0.02588164206680421
+    }
+  },
+  "passed": true,
+  "verification_date": "2026-11-09",
+  "execution_platform": "macOS; x86_64 tools under Rosetta on Apple Silicon",
+  "source_recipe_commit": "040b9c7962355b1f8fa1312b7af867b458102b85",
+  "software": {
+    "cdo": "Climate Data Operators version 2.5.0 (https://mpimet.mpg.de/cdo)",
+    "nco": "NCO netCDF Operators version 5.3.9 \"Koa Kai\" built by rattler on sat12-jr314-7efe186f-6186-40e1-a81c-9b7d98b3a658-3A939D25ED04.local at Apr 20 2026 06:01:51",
+    "python": "Python 3.12.14"
+  },
+  "comparison_scope": "Three independent Python, CDO and NCO implementations of the inspected recipe definitions; not a rerun of upstream ESMValTool.",
+  "warnings_in_final_comparison": false
+}

@@ -1,0 +1,79 @@
+{
+  "input": {
+    "source_id": "WORKSHOP-DEMO",
+    "variant_label": "r1i1p1f1",
+    "period": "1979-2024",
+    "baseline": "1981-2010",
+    "months": 552,
+    "years": 46,
+    "calendar": "proleptic_gregorian",
+    "time_units": "days since 1850-01-01",
+    "synthetic": true
+  },
+  "absolute_tolerance_degC": 0.0003,
+  "comparisons": {
+    "cdo/climatology": {
+      "max_absolute_difference_degC": 0.0,
+      "passed": true
+    },
+    "nco/climatology": {
+      "max_absolute_difference_degC": 0.0,
+      "passed": true
+    },
+    "cdo/anomaly": {
+      "max_absolute_difference_degC": 0.0,
+      "passed": true
+    },
+    "nco/anomaly": {
+      "max_absolute_difference_degC": 0.0,
+      "passed": true
+    },
+    "cdo/map_mean": {
+      "max_absolute_difference_degC": 0.0,
+      "passed": true
+    },
+    "nco/map_mean": {
+      "max_absolute_difference_degC": 0.0,
+      "passed": true
+    },
+    "cdo/arctic_monthly": {
+      "max_absolute_difference_degC": 8.881784197001252e-16,
+      "passed": true
+    },
+    "nco/arctic_monthly": {
+      "max_absolute_difference_degC": 8.881784197001252e-16,
+      "passed": true
+    },
+    "cdo/arctic_annual": {
+      "max_absolute_difference_degC": 2.220446049250313e-16,
+      "passed": true
+    },
+    "nco/arctic_annual": {
+      "max_absolute_difference_degC": 4.440892098500626e-16,
+      "passed": true
+    }
+  },
+  "invariants": {
+    "python": {
+      "baseline_residual_degC": 1.6579330501069005e-15,
+      "annual_equal_months": true,
+      "time_coverage": true,
+      "weighted_vs_arithmetic_map_difference_degC": 0.0007940233913046324
+    },
+    "cdo": {
+      "baseline_residual_degC": 1.6579330501069005e-15,
+      "annual_equal_months": true,
+      "time_coverage": true,
+      "annual_bounds_full_year": true,
+      "weighted_vs_arithmetic_map_difference_degC": 0.0007940233913046324
+    },
+    "nco": {
+      "baseline_residual_degC": 1.6579330501069005e-15,
+      "annual_equal_months": true,
+      "time_coverage": true,
+      "annual_bounds_full_year": true,
+      "weighted_vs_arithmetic_map_difference_degC": 0.0007940233913046324
+    }
+  },
+  "passed": true
+}

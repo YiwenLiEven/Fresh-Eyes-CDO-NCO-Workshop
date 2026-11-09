@@ -1,0 +1,84 @@
+{
+  "date": "2026-11-09",
+  "platform": "macOS / Apple Silicon with existing x86_64 Conda runtime via Rosetta",
+  "versions": {
+    "cdo": "2.5.0",
+    "nco": "5.3.9",
+    "python": "3.12.14"
+  },
+  "notebooks": [
+    {
+      "notebook": "notebooks/00_yl_20_minute_binder_demo.ipynb",
+      "execution_method": "IPython in-process; no Jupyter kernel, browser or Binder session",
+      "live_jupyter_verified": false,
+      "passed": true,
+      "elapsed_seconds": 10.045493125915527,
+      "notebook_sha256": "7f1033164b60e6048e5bd41c31e495844ad09ee73252d52a872073bd22af0a6c",
+      "code_cells": 8,
+      "stderr_cells": 0,
+      "data_mode": "synthetic software fixture, not ACCESS-CM2",
+      "period": "1979-2024",
+      "product_comparisons": 10,
+      "maximum_difference_degC": 8.881784197001252e-16,
+      "invariants": {
+        "python": {
+          "baseline_residual_degC": 1.6579330501069005e-15,
+          "annual_equal_months": true,
+          "time_coverage": true,
+          "weighted_vs_arithmetic_map_difference_degC": 0.0007940233913046324
+        },
+        "cdo": {
+          "baseline_residual_degC": 1.6579330501069005e-15,
+          "annual_equal_months": true,
+          "time_coverage": true,
+          "annual_bounds_full_year": true,
+          "weighted_vs_arithmetic_map_difference_degC": 0.0007940233913046324
+        },
+        "nco": {
+          "baseline_residual_degC": 1.6579330501069005e-15,
+          "annual_equal_months": true,
+          "time_coverage": true,
+          "annual_bounds_full_year": true,
+          "weighted_vs_arithmetic_map_difference_degC": 0.0007940233913046324
+        }
+      }
+    },
+    {
+      "notebook": "notebooks/04_monthly_anomaly_hands_on.ipynb",
+      "execution_method": "IPython in-process; no Jupyter kernel, browser or Binder session",
+      "live_jupyter_verified": false,
+      "passed": true,
+      "elapsed_seconds": 11.437342882156372,
+      "notebook_sha256": "838f781a2e2715a620c2f59cb791cbfdb75f16fdfb59504767cf657b2068a0d0",
+      "code_cells": 10,
+      "stderr_cells": 0,
+      "data_mode": "synthetic software fixture, not ACCESS-CM2",
+      "period": "1979-2024",
+      "product_comparisons": 10,
+      "maximum_difference_degC": 8.881784197001252e-16,
+      "invariants": {
+        "python": {
+          "baseline_residual_degC": 1.6579330501069005e-15,
+          "annual_equal_months": true,
+          "time_coverage": true,
+          "weighted_vs_arithmetic_map_difference_degC": 0.0007940233913046324
+        },
+        "cdo": {
+          "baseline_residual_degC": 1.6579330501069005e-15,
+          "annual_equal_months": true,
+          "time_coverage": true,
+          "annual_bounds_full_year": true,
+          "weighted_vs_arithmetic_map_difference_degC": 0.0007940233913046324
+        },
+        "nco": {
+          "baseline_residual_degC": 1.6579330501069005e-15,
+          "annual_equal_months": true,
+          "time_coverage": true,
+          "annual_bounds_full_year": true,
+          "weighted_vs_arithmetic_map_difference_degC": 0.0007940233913046324
+        }
+      }
+    }
+  ],
+  "limitation": "A normal Jupyter kernel could not bind a socket in the execution sandbox. These checks executed the notebook cells with IPython in-process, including Bash magics. They do not verify a live Jupyter UI, real ACCESS-CM2 scenario data, GitHub publication or a fresh Binder build."
+}

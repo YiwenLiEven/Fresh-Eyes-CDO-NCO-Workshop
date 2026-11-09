@@ -2,6 +2,10 @@
   "name": "Fresh Eyes CDO/NCO Workshop",
   "image": "mcr.microsoft.com/devcontainers/python:1-3.11-bookworm",
   "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "remoteEnv": {
+    "PATH": "${containerWorkspaceFolder}/.runtime/env/bin:${containerWorkspaceFolder}/.runtime/bin:${containerEnv:PATH}",
+    "MAMBA_ROOT_PREFIX": "${containerWorkspaceFolder}/.runtime/mamba-root"
+  },
   "customizations": {
     "vscode": {
       "extensions": [
@@ -9,7 +13,7 @@
         "ms-toolsai.jupyter"
       ],
       "settings": {
-        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.defaultInterpreterPath": "${containerWorkspaceFolder}/.runtime/env/bin/python",
         "jupyter.askForKernelRestart": false,
         "files.eol": "\n"
       }

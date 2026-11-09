@@ -32,3 +32,8 @@ jobs:
             outputs/demo/monthly/*validation.json
             outputs/demo/monthly/*.png
             outputs/executed/*.ipynb
+            outputs/updated_build/*validation.json
+            outputs/updated_build/*.png
+            outputs/updated_real_build/*validation.json
+            outputs/updated_real_build/*.png
+            data/access_cm2/download_receipt.json

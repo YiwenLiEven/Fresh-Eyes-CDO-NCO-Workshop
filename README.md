@@ -1,45 +1,84 @@
-# Fresh Eyes: Python vs CDO-only vs NCO-only
+# Fresh Eyes: Python, CDO-only and NCO-only
 
-[Launch the seminar in Binder](https://mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/ea6af63d118797569d8068baab669281aaa2d137?urlpath=lab/tree/notebooks/00_yl_20_minute_binder_demo.ipynb)
+**Updated local seminar · 9 November 2026 · Yiwen Li**
 
-[Open the participant hands-on notebook](https://mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/ea6af63d118797569d8068baab669281aaa2d137?urlpath=lab/tree/notebooks/04_monthly_anomaly_hands_on.ipynb) · [Download the presentation](slides/CDO_NCO_Hands_On_Comparison_YL_2026_Final.pptx)
+The updated demonstration follows [Evgenia Galytska's ESMValTool recipe](https://github.com/egalytska/Fresh_eyes/blob/040b9c7962355b1f8fa1312b7af867b458102b85/ESMValTool/recipe_temperature_anomalies.yml):
+historical + SSP5-8.5 data, **1979–2024** anomalies against the **1981–2010** monthly
+reference. CDO and NCO each process the original input files independently.
+Python provides a third route, numerical checks and comparison graphics.
 
-**Verified on 3 November 2026:** the pinned revision `ea6af63` built successfully on public Binder, opened JupyterLab, and passed all eight CDO/Python and NCO/Python comparisons. Both seminar notebooks executed without errors; both tests passed during the build. The largest numerical difference was 8.14e-06 degC (tolerance 0.0003 degC). See [Binder verification](docs/binder_launch_verification.json) and [the successful GitHub Actions run](https://github.com/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/actions/runs/41609810743). The launch links above use that tested commit.
+**The notebooks now default to real ACCESS-CM2 historical + SSP5-8.5 data.**
+The Binder build caches the two organizer files; they are also staged on the
+prepared Mac. Missing real files stop execution. Synthetic inputs are available
+only through an explicit `WORKSHOP_MODE=synthetic` software-test mode.
 
-## Current seminar workflow
+## Start
 
-Three independent implementations start from the same raw Kelvin NetCDF:
+- [20-minute seminar notebook](notebooks/00_yl_20_minute_binder_demo.ipynb)
+- [Participant hands-on notebook](notebooks/04_monthly_anomaly_hands_on.ipynb)
+- [Local setup, real-data mode and scientific definitions](docs/UPDATED_DEMO.md)
 
-| Route | Complete processing implementation | Final visualization |
-|---|---|---|
-| Python reference | xarray | Python/matplotlib |
-| CDO-only | CDO, no NCO commands | Python/matplotlib |
-| NCO-only | NCO, no CDO commands | Python/matplotlib |
+```bash
+conda env create -f binder/environment.yml
+conda activate fresh-eyes
+python scripts/fetch_updated_data.py
+jupyter lab notebooks/00_yl_20_minute_binder_demo.ipynb
+```
 
-All routes reproduce EG's monthly climatology (1981-2010), monthly anomalies (1979-2014), mean anomaly map, arithmetic Arctic mean (65-90N), and equal-month annual stripes. Each has its own output directory. Python validates eight comparisons: four CDO products against Python, and four NCO products against Python. CDO explicitly uses fldmean,weights=false. Bare fldmean and fldavg use area weights and would change the shared definition.
+On the prepared Mac, the project-level `Launch_Updated_Notebook.command` uses the
+existing local CDO/NCO/Jupyter environment. No global shell changes are required.
 
-### Start
+## Common calculation
 
-Open notebooks/00_yl_20_minute_binder_demo.ipynb and run all cells. For practice open notebooks/04_monthly_anomaly_hands_on.ipynb.
+| Product | Shared definition |
+|---|---|
+| Monthly climatology | 1981–2010 mean for each calendar month |
+| Monthly anomalies | 1979–2024, 552 fields |
+| Mean anomaly map | **Month-duration weighted** mean |
+| Arctic monthly series | 65–90°N, **equal grid-point weights** |
+| Annual stripes | 46 years; **equal weight for each monthly sample** |
 
-The default input is deterministic **synthetic** teaching data, not ACCESS-CM2 output. Supply WORKSHOP_INPUT to use a real shared file that satisfies the documented input contract. Scripts require complete monthly Kelvin tas(time,lat,lon), a regular 0-360 longitude grid, no missing values, all of 1979-2014, and all of 1981-2010. The read-only input checker rejects unsupported inputs instead of silently treating them as equivalent.
+The map and annual series use different time weights, following the recipe.
+Five CDO products and five NCO products are checked against Python with an
+absolute tolerance of 0.0003°C, exact coordinate/calendar alignment and additional
+baseline and annual-mean checks. Optional `END_YEAR=2100` is an extension.
 
-Run locally in the prepared Linux environment:
+```bash
+python scripts/fetch_updated_data.py
+bash scripts/run_updated_workflows.sh \
+  data/access_cm2/tas_Amon_ACCESS-CM2_historical_r1i1p1f1_gn_185001-201412.nc \
+  data/access_cm2/tas_Amon_ACCESS-CM2_ssp585_r1i1p1f1_gn_201501-210012.nc \
+  outputs/updated_real 2024
+```
 
-    python -m pip install -e .
-    python scripts/generate_demo_data.py
-    bash scripts/run_independent_workflows.sh
+Results include route-specific NetCDF files, `updated_validation.json` and
+`updated_comparison.png`.
 
-Outputs: outputs/demo/monthly/{python,cdo,nco}, three_way_validation.json and three_way_comparison.png.
+## Local validation
 
-Numerical agreement means absolute error <= 0.0003 degC (rtol=0), exact calendar/spatial alignment and matching masks. It does not mean byte-identical NetCDF files. Metadata and mid-month timestamps may differ while calendar-month labels agree.
+The real 1979–2024 ACCESS-CM2 workflow has passed all ten product comparisons,
+including the annual time-bound checks. All **8 seminar code cells and 10
+participant code cells** passed with their default real inputs; final cell stderr
+streams were empty. The exact results and notebook hashes are in
+[the verification record](docs/UPDATED_NOTEBOOK_CHECKS.json). These local checks
+execute cells with IPython in-process; they are distinct from a live Jupyter or
+Binder session test. Synthetic software-test evidence is retained separately.
 
-### Legacy material
+## Publication status
 
-The previous combined CDO/NCO script, global annual examples, NCL figures and notebooks 00_opening_demo through 03_hands_on_exercises remain historical/optional examples. They are not the current three-route seminar. The old executed notebooks and verification report describe the old revision, not evidence for the new one. Use the pinned revision and current Binder verification linked above for the independent-workflow seminar.
+Target: [YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop](https://github.com/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop).
+This folder contains the local update. GitHub publication and a new Binder image
+must be verified separately; the previous successful Binder run does not verify
+this revision. Keep existing pinned links labeled as the earlier version until a
+new tested commit is available.
 
-### Attribution
+## Attribution and earlier material
 
-Original Python workshop: [abhnil/Fresh_Eyes_on_CMIP_Data_Workshop](https://github.com/abhnil/Fresh_Eyes_on_CMIP_Data_Workshop).
-Shared compressed reference: [egalytska/Fresh_eyes, stripes_EG.ipynb](https://github.com/egalytska/Fresh_eyes/blob/393cfcf876fa47c6c231c3be70dbd9f8552fe3a3/stripes_EG.ipynb).
-The independent command-line implementations, input contract, equivalence checks and shared Python comparison figure are workshop extensions. Original source audits remain in docs/ORIGINAL_WORKSHOP_MAPPING.md and docs/EG_SHARED_NOTEBOOK_MAPPING.md; their old combined-route descriptions are historical.
+Original Python workshop: [Abhnil / Fresh_Eyes_on_CMIP_Data_Workshop](https://github.com/abhnil/Fresh_Eyes_on_CMIP_Data_Workshop).
+Updated shared reference: [Evgenia Galytska / Fresh_eyes](https://github.com/egalytska/Fresh_eyes).
+Independent command-line implementations and teaching material: Yiwen Li's workshop.
+
+Earlier 1979–2014 notebook sources are retained as `notebooks/legacy_*.ipynb`.
+The existing combined CDO/NCO scripts, NCL material, old figures and saved execution
+reports belong to earlier demonstrations. Their archived PASS records must not be
+presented as validation of the new 1979–2024 calculation.
