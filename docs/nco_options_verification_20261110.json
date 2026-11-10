@@ -1,0 +1,301 @@
+{
+  "date": "2026-11-10",
+  "scope": "Local notebook NCO simplification for supplied ACCESS-CM2 inputs",
+  "execution_method": "IPython in-process; no live Jupyter/Binder verification",
+  "published": false,
+  "online_reference_unchanged": "b71a1fda9a6fb15c7b3741fac1ed8eacc6efa302",
+  "nco_version": "5.3.9",
+  "changes": [
+    "Remove initial -3 and both --mk_rec_dmn time",
+    "Select tas or tas_anom with automatic coordinates and bounds",
+    "Remove no-op time_bnds fill-attribute deletion",
+    "Remove redundant double cast of float64 time bounds",
+    "Remove duplicate arctic_record copy and use arctic_monthly directly",
+    "Use time,0 instead of time,0,0 in practice query"
+  ],
+  "retained": [
+    "Focused -m/-H/-C query patterns",
+    "-A -C for coordinate-safe append",
+    "double(tas), averaging weights, grouping and dimension-fix options"
+  ],
+  "notebooks": {
+    "main": {
+      "notebook": "notebooks/00_yl_20_minute_binder_demo.ipynb",
+      "sha256": "c4342628c26ac9f68b2c12111aef0e9f069506aa1daba82823cfcaab83f44dd1",
+      "code_cells_passed": 117,
+      "nonempty_inspections": 56,
+      "elapsed_seconds": 32.61663103103638,
+      "comparisons": {
+        "cdo/climatology": {
+          "max_absolute_difference_degC": 0.0,
+          "passed": true
+        },
+        "nco/climatology": {
+          "max_absolute_difference_degC": 0.0,
+          "passed": true
+        },
+        "cdo/anomaly": {
+          "max_absolute_difference_degC": 0.0,
+          "passed": true
+        },
+        "nco/anomaly": {
+          "max_absolute_difference_degC": 0.0,
+          "passed": true
+        },
+        "cdo/map_mean": {
+          "max_absolute_difference_degC": 0.0,
+          "passed": true
+        },
+        "nco/map_mean": {
+          "max_absolute_difference_degC": 0.0,
+          "passed": true
+        },
+        "cdo/arctic_monthly": {
+          "max_absolute_difference_degC": 3.552713678800501e-15,
+          "passed": true
+        },
+        "nco/arctic_monthly": {
+          "max_absolute_difference_degC": 2.6645352591003757e-15,
+          "passed": true
+        },
+        "cdo/arctic_annual": {
+          "max_absolute_difference_degC": 8.881784197001252e-16,
+          "passed": true
+        },
+        "nco/arctic_annual": {
+          "max_absolute_difference_degC": 4.440892098500626e-16,
+          "passed": true
+        }
+      },
+      "invariants": {
+        "python": {
+          "baseline_residual_degC": 5.968558980384842e-14,
+          "annual_equal_months": true,
+          "time_coverage": true,
+          "weighted_vs_arithmetic_map_difference_degC": 0.007861762999614247
+        },
+        "cdo": {
+          "baseline_residual_degC": 5.968558980384842e-14,
+          "annual_equal_months": true,
+          "time_coverage": true,
+          "annual_bounds_full_year": true,
+          "weighted_vs_arithmetic_map_difference_degC": 0.007861762999614247
+        },
+        "nco": {
+          "baseline_residual_degC": 5.968558980384842e-14,
+          "annual_equal_months": true,
+          "time_coverage": true,
+          "annual_bounds_full_year": true,
+          "weighted_vs_arithmetic_map_difference_degC": 0.007861762999614247
+        }
+      },
+      "exact_difference_from_previous_nco": {
+        "climatology": 0.0,
+        "anomaly": 0.0,
+        "map_mean": 0.0,
+        "arctic_monthly": 0.0,
+        "arctic_annual": 0.0
+      },
+      "file_checks": {
+        "historical": {
+          "format": "NETCDF4_CLASSIC",
+          "time_records": 432,
+          "time_unlimited": true,
+          "time_bounds_retained": true
+        },
+        "ssp585": {
+          "format": "NETCDF4_CLASSIC",
+          "time_records": 120,
+          "time_unlimited": true,
+          "time_bounds_retained": true
+        },
+        "anomaly": {
+          "format": "NETCDF4_CLASSIC",
+          "time_records": 552,
+          "time_unlimited": true,
+          "time_bounds_retained": true
+        },
+        "arctic_monthly": {
+          "format": "NETCDF4_CLASSIC",
+          "time_records": 552,
+          "time_unlimited": true,
+          "time_bounds_retained": true
+        }
+      }
+    },
+    "practice": {
+      "notebook": "notebooks/04_monthly_anomaly_hands_on.ipynb",
+      "sha256": "23f2e3c1affff43ab2f19beaede692d09fe4f8a6f325467dcfe27bba4fe5ef79",
+      "code_cells_passed": 132,
+      "nonempty_inspections": 62,
+      "elapsed_seconds": 35.362690687179565,
+      "comparisons": {
+        "cdo/climatology": {
+          "max_absolute_difference_degC": 0.0,
+          "passed": true
+        },
+        "nco/climatology": {
+          "max_absolute_difference_degC": 0.0,
+          "passed": true
+        },
+        "cdo/anomaly": {
+          "max_absolute_difference_degC": 0.0,
+          "passed": true
+        },
+        "nco/anomaly": {
+          "max_absolute_difference_degC": 0.0,
+          "passed": true
+        },
+        "cdo/map_mean": {
+          "max_absolute_difference_degC": 0.0,
+          "passed": true
+        },
+        "nco/map_mean": {
+          "max_absolute_difference_degC": 0.0,
+          "passed": true
+        },
+        "cdo/arctic_monthly": {
+          "max_absolute_difference_degC": 3.552713678800501e-15,
+          "passed": true
+        },
+        "nco/arctic_monthly": {
+          "max_absolute_difference_degC": 2.6645352591003757e-15,
+          "passed": true
+        },
+        "cdo/arctic_annual": {
+          "max_absolute_difference_degC": 8.881784197001252e-16,
+          "passed": true
+        },
+        "nco/arctic_annual": {
+          "max_absolute_difference_degC": 4.440892098500626e-16,
+          "passed": true
+        }
+      },
+      "invariants": {
+        "python": {
+          "baseline_residual_degC": 5.968558980384842e-14,
+          "annual_equal_months": true,
+          "time_coverage": true,
+          "weighted_vs_arithmetic_map_difference_degC": 0.007861762999614247
+        },
+        "cdo": {
+          "baseline_residual_degC": 5.968558980384842e-14,
+          "annual_equal_months": true,
+          "time_coverage": true,
+          "annual_bounds_full_year": true,
+          "weighted_vs_arithmetic_map_difference_degC": 0.007861762999614247
+        },
+        "nco": {
+          "baseline_residual_degC": 5.968558980384842e-14,
+          "annual_equal_months": true,
+          "time_coverage": true,
+          "annual_bounds_full_year": true,
+          "weighted_vs_arithmetic_map_difference_degC": 0.007861762999614247
+        }
+      },
+      "exact_difference_from_previous_nco": {
+        "climatology": 0.0,
+        "anomaly": 0.0,
+        "map_mean": 0.0,
+        "arctic_monthly": 0.0,
+        "arctic_annual": 0.0
+      },
+      "file_checks": {
+        "historical": {
+          "format": "NETCDF4_CLASSIC",
+          "time_records": 432,
+          "time_unlimited": true,
+          "time_bounds_retained": true
+        },
+        "ssp585": {
+          "format": "NETCDF4_CLASSIC",
+          "time_records": 120,
+          "time_unlimited": true,
+          "time_bounds_retained": true
+        },
+        "anomaly": {
+          "format": "NETCDF4_CLASSIC",
+          "time_records": 552,
+          "time_unlimited": true,
+          "time_bounds_retained": true
+        },
+        "arctic_monthly": {
+          "format": "NETCDF4_CLASSIC",
+          "time_records": 552,
+          "time_unlimited": true,
+          "time_bounds_retained": true
+        }
+      }
+    }
+  },
+  "passed": true,
+  "synthetic_main_check": {
+    "passed": true,
+    "code_cells_passed": 117,
+    "comparisons": {
+      "cdo/climatology": {
+        "max_absolute_difference_degC": 0.0,
+        "passed": true
+      },
+      "nco/climatology": {
+        "max_absolute_difference_degC": 0.0,
+        "passed": true
+      },
+      "cdo/anomaly": {
+        "max_absolute_difference_degC": 0.0,
+        "passed": true
+      },
+      "nco/anomaly": {
+        "max_absolute_difference_degC": 0.0,
+        "passed": true
+      },
+      "cdo/map_mean": {
+        "max_absolute_difference_degC": 0.0,
+        "passed": true
+      },
+      "nco/map_mean": {
+        "max_absolute_difference_degC": 0.0,
+        "passed": true
+      },
+      "cdo/arctic_monthly": {
+        "max_absolute_difference_degC": 8.881784197001252e-16,
+        "passed": true
+      },
+      "nco/arctic_monthly": {
+        "max_absolute_difference_degC": 8.881784197001252e-16,
+        "passed": true
+      },
+      "cdo/arctic_annual": {
+        "max_absolute_difference_degC": 2.220446049250313e-16,
+        "passed": true
+      },
+      "nco/arctic_annual": {
+        "max_absolute_difference_degC": 4.440892098500626e-16,
+        "passed": true
+      }
+    },
+    "invariants": {
+      "python": {
+        "baseline_residual_degC": 1.6579330501069005e-15,
+        "annual_equal_months": true,
+        "time_coverage": true,
+        "weighted_vs_arithmetic_map_difference_degC": 0.0007940233913046324
+      },
+      "cdo": {
+        "baseline_residual_degC": 1.6579330501069005e-15,
+        "annual_equal_months": true,
+        "time_coverage": true,
+        "annual_bounds_full_year": true,
+        "weighted_vs_arithmetic_map_difference_degC": 0.0007940233913046324
+      },
+      "nco": {
+        "baseline_residual_degC": 1.6579330501069005e-15,
+        "annual_equal_months": true,
+        "time_coverage": true,
+        "annual_bounds_full_year": true,
+        "weighted_vs_arithmetic_map_difference_degC": 0.0007940233913046324
+      }
+    },
+    "execution_method": "IPython in-process; no Jupyter kernel, browser or Binder session"
+  }
+}

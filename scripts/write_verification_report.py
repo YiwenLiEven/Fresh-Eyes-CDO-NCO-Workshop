@@ -10,16 +10,28 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 REFERENCE_COMMIT = '040b9c7962355b1f8fa1312b7af867b458102b85'
+SHORT_NOTEBOOK = '05_annual_stripes_short_demo'
 
 
-def checked_real_validation(path):
+def checked_real_validation(path, annual_only=False):
     evidence = json.loads(path.read_text())
     assert evidence['passed'], f'Validation failed: {path}'
     assert evidence['input']['source_id'] == 'ACCESS-CM2'
     assert evidence['input']['synthetic'] is False
     assert evidence['input']['period'] == '1979-2024'
     assert evidence['input']['months'] == 552 and evidence['input']['years'] == 46
-    assert len(evidence['comparisons']) == 10
+    if annual_only:
+        assert set(evidence['comparisons']) == {'cdo', 'nco'}
+        assert all(item['years'] == 46 and item['annual_temperature_and_subtraction_checked']
+                   for item in evidence['comparisons'].values())
+        assert evidence['cdo_annual_bounds_full_year'] is True
+        assert evidence['nco_output_metadata']
+        assert evidence['conditions']['complete_months_and_finite_grid'] is True
+        assert evidence['conditions']['equal_month_annual_weights'] is True
+        assert evidence['conditions']['equal_grid_weights_65_to_90N'] is True
+        assert evidence['conditions']['baseline'] == '1981-2010'
+    else:
+        assert len(evidence['comparisons']) == 10
     assert all(item['passed'] for item in evidence['comparisons'].values())
     return evidence
 
@@ -44,8 +56,9 @@ def checked_notebook(name):
     assert match, f'No run directory printed by {name}'
     run = Path(match.group(1).strip())
     assert run.resolve().is_relative_to(Path('outputs').resolve())
-    validation_path = run / 'updated_validation.json'
-    validation = checked_real_validation(validation_path)
+    annual_only = name == SHORT_NOTEBOOK
+    validation_path = run / ('short_validation.json' if annual_only else 'updated_validation.json')
+    validation = checked_real_validation(validation_path, annual_only=annual_only)
     return {
         'data_mode': 'real', 'analysis_period': validation['input']['period'],
         'code_cell_count': len(code_cells), 'execution_counts': counts,
@@ -54,6 +67,8 @@ def checked_notebook(name):
         'executed_sha256': hashlib.sha256(executed_path.read_bytes()).hexdigest(),
         'run_validation_file': validation_path.as_posix(),
         'run_validation_passed': True,
+        'validation_scope': 'annual_arctic_series' if annual_only else 'five_products',
+        'run_validation': validation,
     }
 
 
@@ -78,10 +93,10 @@ def main():
         result = subprocess.run([tool, *args], check=True, text=True, capture_output=True)
         report['tools'][tool] = (result.stdout + result.stderr).strip()
     report['notebooks'] = {name: checked_notebook(name) for name in
-                           ('00_yl_20_minute_binder_demo', '04_monthly_anomaly_hands_on')}
+                           ('00_yl_20_minute_binder_demo', '04_monthly_anomaly_hands_on', SHORT_NOTEBOOK)}
     report['notebooks_executed'] = True
     Path('outputs/verification.json').write_text(json.dumps(report, indent=2) + '\n')
-    print('PASS: outputs/verification.json records real 1979–2024 data, ten comparisons and every notebook code cell.')
+    print('PASS: outputs/verification.json records real 1979–2024 data, full five-product checks, short annual-series checks and every code cell in all three notebooks.')
 
 
 if __name__ == '__main__':

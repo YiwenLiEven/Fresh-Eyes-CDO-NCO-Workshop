@@ -264,7 +264,7 @@ the full series.'''),
      'cdo outputtab,date,value -seltimestep,1 exercises/cdo_monthly_70N.nc'),
     ('Average the same region with NCO', 'Select 70–90°N and average latitude and longitude. Compare the first value with CDO.',
      'ncwa -a lat,lon -d lat,70.0,90.0 nco/anomaly.nc exercises/nco_monthly_70N.nc',
-     'ncks -H -C -v tas_anom -d time,0,0 exercises/nco_monthly_70N.nc'),
+     'ncks -H -C -v tas_anom -d time,0 exercises/nco_monthly_70N.nc'),
 ], '2'),
 code('''import numpy as np
 import xarray as xr

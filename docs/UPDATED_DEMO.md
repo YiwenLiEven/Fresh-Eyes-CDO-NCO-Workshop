@@ -1,7 +1,15 @@
 # CDO/NCO notebooks: run a command and inspect its result
 
-- [Main notebook](../notebooks/00_yl_20_minute_binder_demo.ipynb)
+- **[Short annual lesson in Binder — recommended for 20 minutes](https://mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/main?urlpath=lab/tree/notebooks/05_annual_stripes_short_demo.ipynb)**
+- [Complete five-product notebook](../notebooks/00_yl_20_minute_binder_demo.ipynb)
 - [Practice notebook](../notebooks/04_monthly_anomaly_hands_on.ipynb)
+
+The short lesson has 11 CDO and 9 NCO processing/query pairs and 45 executable
+cells. It compares final annual Arctic anomalies and stripes. The complete
+notebook has 117 cells; the practice notebook has 132 cells. They also calculate
+monthly climatology, monthly anomaly fields and the duration-weighted map.
+See [SHORT_ANNUAL_DEMO.md](SHORT_ANNUAL_DEMO.md) for the annual equivalence and
+suggested presentation timing.
 
 ## Follow each result
 
@@ -23,7 +31,8 @@ the run directory printed in the Data output, then copy the same command text.
 To repeat the whole calculation, start again from the
 first cell; a new run directory keeps the previous files intact.
 
-The short queries make each transformation observable:
+The queries make each transformation observable; monthly-field steps occur in
+the complete notebooks:
 
 | After processing | Inspect the result |
 | --- | --- |
@@ -36,8 +45,15 @@ The short queries make each transformation observable:
 | Annual reduction | 46 annual values and calendar-year coverage |
 
 CDO uses `-b F64` once when joining the experiments, before the Kelvin-to-Celsius
-arithmetic. Later outputs inherit double precision. NCO chooses classic NetCDF
-once in the first historical extraction; its derived files inherit that format.
+arithmetic. Later outputs inherit double precision. NCO inherits the input file
+format and the existing expandable time dimension. `-v tas` also retains its
+linked coordinates and time bounds. These simplifications are verified for the
+supplied ACCESS-CM2 files and the software fixture; different input files may
+need their own format or dimension settings.
+
+The result queries retain `-m` (metadata), `-H` (values) and `-C` (requested
+variables only), which keep the displayed result focused. In append commands,
+`-C` also prevents associated coordinates from replacing the target time axis.
 
 ## Source and scientific definitions
 
@@ -48,7 +64,7 @@ examples originate in [Abhnil's Python workshop](https://github.com/abhnil/Fresh
 CDO and NCO independently process the same inputs; Python provides a third
 calculation, numerical comparisons and figures.
 
-| Scientific choice | Teaching calculation |
+| Scientific choice | Complete five-product calculation |
 | --- | --- |
 | Model and experiments | ACCESS-CM2 historical + SSP5-8.5, member `r1i1p1f1`, grid `gn` |
 | Analysis period | January 1979–December 2024: 552 months and 46 annual values |
@@ -63,6 +79,12 @@ Arctic series uses `extract_region`, `zonal_statistics(mean)` and
 output. The duration-weighted map and equal-month annual definitions were
 checked against ESMValCore 2.10.0 source. This source audit is separate from
 executing the upstream recipe or comparing its saved output files.
+
+The short lesson uses the same final annual definition. It first calculates
+annual Arctic temperatures and then subtracts the 1981–2010 mean annual
+reference. With complete years, fixed spatial weights and equal month weights,
+this is equivalent to averaging the monthly anomalies. Its scope is the final
+annual series; it does not produce the intermediate monthly fields or map.
 
 Every route uses the historical 1981–2010 reference for both experiments. Input
 checks require matching grids, calendars and model/member metadata, consecutive
@@ -110,7 +132,7 @@ repository folder:
 conda env create -f binder/environment.yml
 conda activate fresh-eyes
 python scripts/fetch_updated_data.py
-jupyter lab notebooks/00_yl_20_minute_binder_demo.ipynb
+jupyter lab notebooks/05_annual_stripes_short_demo.ipynb
 ```
 
 Once the environment and inputs are installed, the notebooks can run offline.
@@ -120,9 +142,10 @@ than copying its directory. NCO 5.1.9 or later is needed for `ncra --mro`.
 
 Open the latest published notebooks online:
 
-- [Main notebook in Binder](https://mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/main?urlpath=lab/tree/notebooks/00_yl_20_minute_binder_demo.ipynb)
+- **[Short annual lesson in Binder](https://mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/main?urlpath=lab/tree/notebooks/05_annual_stripes_short_demo.ipynb)**
+- [Complete five-product notebook in Binder](https://mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/main?urlpath=lab/tree/notebooks/00_yl_20_minute_binder_demo.ipynb)
 - [Practice notebook in Binder](https://mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/main?urlpath=lab/tree/notebooks/04_monthly_anomaly_hands_on.ipynb)
-- [BIDS Binder alternative](https://bids.mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/main?urlpath=lab/tree/notebooks/00_yl_20_minute_binder_demo.ipynb)
+- [BIDS Binder alternative for the short lesson](https://bids.mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/main?urlpath=lab/tree/notebooks/05_annual_stripes_short_demo.ipynb)
 
 Older commit-pinned links select their earlier notebook revisions. Binder
 sessions are temporary; save your edited notebook and results before leaving.
@@ -130,8 +153,12 @@ The local installation is available when public Binder is unavailable.
 
 ## Results and batch extension
 
-Each run contains independent `python/`, `cdo/` and `nco/` products,
-`updated_validation.json` and `updated_comparison.png`. Five products from each
+Each run contains independent `python/`, `cdo/` and `nco/` products. The short
+lesson writes `short_validation.json` and `short_comparison.png`, comparing the
+46 annual anomalies per route with the complete monthly-anomaly reference.
+
+The complete notebooks write `updated_validation.json` and
+`updated_comparison.png`. Five products from each
 command-line route are compared with the reference: monthly climatology,
 monthly anomalies, duration-weighted map, Arctic monthly series and annual
 series. Tolerance is 0.0003°C absolute with zero relative tolerance. Coordinates,
@@ -154,25 +181,33 @@ stripe color scale.
 
 ## Verification by revision
 
-The current one-command/one-query format with bare command names passed complete local, in-process
-IPython execution using real ACCESS-CM2 data for 1979–2024: 552 monthly fields
-and 46 annual values. Every code cell completed successfully, every query cell
-produced output, and all standard error streams were empty.
+The **10 November revision** adds the short annual lesson and removes redundant
+NCO settings and a duplicate monthly-record copy from the complete notebooks.
+All three passed local, in-process IPython execution with real ACCESS-CM2 data.
 
 | Notebook | Processing commands | Result queries | Support cells | Completed code cells |
 | --- | ---: | ---: | ---: | ---: |
-| Main | 57: 20 CDO + 37 NCO | 57 | 5 | 119/119 |
-| Practice | 63: the main lesson + six exercise pairs | 63 | 8 | 134/134 |
+| Short annual lesson | 20: 11 CDO + 9 NCO | 20 | 5 | 45/45 |
+| Complete workflow | 56: 20 CDO + 36 NCO | 56 | 5 | 117/117 |
+| Practice | 62: complete workflow + six exercise pairs | 62 | 8 | 132/132 |
 
-All ten product comparisons passed in each notebook. The largest absolute
-difference from the independent reference was **3.552713678800501e-15°C**;
-method and coordinate checks also passed. The
-[plain-command verification record](plain_commands_verification_20261109.json)
-records notebook hashes, cell counts, numerical results and the execution
-method. This is local in-process evidence. Online CI and a live Binder check
-of this revision are pending at publication. Literal-routing checks also verify
-all 126 command strings and arguments, including NCO brace expressions, and
-confirm that a failed external command raises an error.
+Every query produced output and all captured stderr streams were empty. The
+[short-lesson record](short_annual_verification_20261110.json) includes real and
+synthetic execution; its maximum real annual error against the complete
+monthly-anomaly reference was **2.61124455e-13°C**. The
+[NCO simplification record](nco_options_verification_20261110.json) covers the
+complete notebooks: all ten product comparisons passed, their largest error
+was **3.552713678800501e-15°C**, and all five NCO products exactly matched the
+previous local revision. These records retain their prepublication scope.
+**Online CI and a live Binder check are pending for this release.**
+
+The preceding bare-command revision `b71a1fd...` passed all 119/134 code cells
+in [Linux CI run 42596677410](https://github.com/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/actions/runs/42596677410).
+Its main page also passed a focused live Binder check of CDO and NCO
+selection/query pairs. The [plain-command record](plain_commands_verification_20261109.json)
+records its local hashes and checks, including preservation of all 126 practice
+command strings and error propagation. This is evidence for that earlier source,
+not the new short lesson or the simplified 117/132-cell notebooks.
 
 Earlier evidence keeps its original scope:
 
@@ -187,7 +222,7 @@ Earlier evidence keeps its original scope:
 For `4228f76...`, the main Binder page opened and selected command sections were
 visually checked. No additional browser Run All was performed; both notebooks'
 actual kernel execution was verified by CI and the Binder build. Those results
-do not verify the current command-and-result revision.
+do not verify the 10 November revision.
 
 Direct numerical comparison with Evgenia's saved ESMValTool products and an
 interactive local Mac Jupyter browser session remain separate checks. Earlier

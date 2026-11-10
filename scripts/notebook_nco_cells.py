@@ -3,14 +3,14 @@
 NCO_STEPS = [
     (
         'Select historical months',
-        'Select tas and time bounds for January 1979–December 2014. -v selects variables; -d selects dates; --mk_rec_dmn makes time a record dimension for concatenation. -3 chooses classic NetCDF once; later files inherit it. The metadata shows 432 monthly records.',
-        'ncks -3 --mk_rec_dmn time -v tas,time_bnds -d time,1979-01-01,2014-12-31 data/historical.nc nco/historical.nc',
+        'Select tas for January 1979–December 2014. -v selects the variable; -d selects dates. Its coordinates and time bounds are included automatically. The input already has an expandable time dimension. The metadata shows 432 monthly records.',
+        'ncks -v tas -d time,1979-01-01,2014-12-31 data/historical.nc nco/historical.nc',
         'ncks -m -C -v tas nco/historical.nc',
     ),
     (
         'Select SSP5-8.5 months',
         'Select January 2015–December 2024 from the raw SSP5-8.5 file. The result contains 120 monthly records on the same grid.',
-        'ncks --mk_rec_dmn time -v tas,time_bnds -d time,2015-01-01,2024-12-31 data/ssp585.nc nco/ssp585.nc',
+        'ncks -v tas -d time,2015-01-01,2024-12-31 data/ssp585.nc nco/ssp585.nc',
         'ncks -m -C -v tas nco/ssp585.nc',
     ),
     (
@@ -27,8 +27,8 @@ NCO_STEPS = [
     ),
     (
         'Keep the temperature attributes consistent',
-        'ncatted -a edits attributes in place. The two missing-value attributes use the same double value. Remove the unused fill attribute from complete time bounds and the link to an unavailable external area file. These edits leave valid temperatures unchanged.',
-        'ncatted -a _FillValue,tas,o,d,1.0e20 -a missing_value,tas,o,d,1.0e20 -a _FillValue,time_bnds,d,, -a cell_measures,tas,d,, nco/celsius.nc',
+        'ncatted -a edits attributes in place. The two missing-value attributes use the same double value. Remove the link to an unavailable external area file. These edits leave valid temperatures unchanged.',
+        'ncatted -a _FillValue,tas,o,d,1.0e20 -a missing_value,tas,o,d,1.0e20 -a cell_measures,tas,d,, nco/celsius.nc',
         'ncks -m -C -v tas nco/celsius.nc',
     ),
     (
@@ -129,7 +129,7 @@ NCO_STEPS = [
     ),
     (
         'Fix the month dimension',
-        'Fix the twelve-month dimension before appending the reference. Classic NetCDF permits one record dimension; time remains that dimension in the temperature file.',
+        'Fix the twelve-month dimension before appending the reference. The inherited classic-model format permits one record dimension; time remains that dimension in the temperature file.',
         'ncks --fix_rec_dmn month nco/clim_named.nc nco/clim_fixed.nc',
         'ncks -m -C -v tas_clim nco/clim_fixed.nc',
     ),
@@ -147,14 +147,14 @@ NCO_STEPS = [
     ),
     (
         'Save the monthly anomaly fields',
-        'Retain tas_anom and its time bounds in anomaly.nc. Its metadata shows 552 monthly fields; the twelve reference fields are no longer part of this output.',
-        'ncks -v tas_anom,time_bnds nco/anomaly_all.nc nco/anomaly.nc',
+        'Select tas_anom; its coordinates and time bounds are retained automatically in anomaly.nc. Its metadata shows 552 monthly fields; the twelve reference fields are no longer part of this output.',
+        'ncks -v tas_anom nco/anomaly_all.nc nco/anomaly.nc',
         'ncks -m -C -v tas_anom nco/anomaly.nc',
     ),
     (
         'Calculate each monthly duration',
         'Subtract the lower time bound from the upper bound. duration is measured in the file’s time units. The query prints the first twelve monthly weights.',
-        "ncap2 -s 'duration[time]=double(time_bnds(:,1)-time_bnds(:,0));' nco/anomaly.nc nco/weighted.nc",
+        "ncap2 -s 'duration[time]=time_bnds(:,1)-time_bnds(:,0);' nco/anomaly.nc nco/weighted.nc",
         'ncks -H -C -v duration -d time,0,11 nco/weighted.nc',
     ),
     (
@@ -176,27 +176,21 @@ NCO_STEPS = [
         'ncks -H -C -v tas_anom -d time,0,11 nco/arctic_monthly.nc',
     ),
     (
-        'Prepare the monthly record dimension',
-        'Make time the record dimension required by ncra. The monthly anomaly values are unchanged.',
-        'ncks --mk_rec_dmn time nco/arctic_monthly.nc nco/arctic_record.nc',
-        'ncks -m -C -v tas_anom nco/arctic_record.nc',
-    ),
-    (
         'Average twelve months per year',
         'ncra --mro retains multiple output records. The last two numbers in -d time,,,12,12 specify a twelve-record stride and a twelve-record averaging group. The result contains 46 annual values, 1979–2024, with equal monthly weights. The query shows the first five years.',
-        'ncra --mro -d time,,,12,12 nco/arctic_record.nc nco/arctic_annual.nc',
+        'ncra --mro -d time,,,12,12 nco/arctic_monthly.nc nco/arctic_annual.nc',
         'ncks -H -C -v tas_anom -d time,0,4 nco/arctic_annual.nc',
     ),
     (
         'Select the January bounds',
         'Select monthly records 0, 12, 24, …, 540: January of each year. Their lower bounds provide the starts of the 46 annual intervals. The query shows the first pair of monthly bounds in the file’s numeric time units.',
-        'ncks -v time_bnds -d time,0,,12 nco/arctic_record.nc nco/year_starts.nc',
+        'ncks -v time_bnds -d time,0,,12 nco/arctic_monthly.nc nco/year_starts.nc',
         'ncks -H -C -v time_bnds -d time,0 nco/year_starts.nc',
     ),
     (
         'Select the December bounds',
         'Select records 11, 23, 35, …, 551: December of each year. Their upper bounds provide the ends of the 46 annual intervals.',
-        'ncks -v time_bnds -d time,11,,12 nco/arctic_record.nc nco/year_ends.nc',
+        'ncks -v time_bnds -d time,11,,12 nco/arctic_monthly.nc nco/year_ends.nc',
         'ncks -H -C -v time_bnds -d time,0 nco/year_ends.nc',
     ),
     (

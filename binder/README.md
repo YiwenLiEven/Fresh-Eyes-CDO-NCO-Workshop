@@ -13,7 +13,9 @@ installs this repository and performs separate regression and demonstration chec
 3. Download and hash-check both real ACCESS-CM2 historical and SSP585 inputs,
    then run independent Python, CDO and NCO routes for 1979–2024: ten product
    comparisons plus calendar, coordinate, baseline and annual-definition checks.
-4. Execute both active notebooks with the real inputs and write the build report.
+4. Execute all three active notebooks with the real inputs and write the build
+   report: the short annual lesson (45 cells), complete five-product workflow
+   (117 cells), and practice notebook (132 cells).
 
 A successful build writes `outputs/verification.json` with tool/package versions,
 the real-data 1979–2024 validation and notebook execution evidence. Legacy
@@ -22,8 +24,12 @@ real-data report and figure are
 `outputs/updated_real_build/updated_validation.json` and
 `outputs/updated_real_build/updated_comparison.png`. Executed notebook copies are
 in `outputs/executed/`; each notebook's own output directory is recorded in the
-verification report. The default analysis has 552 monthly values and 46 annual
-values, using the historical 1981–2010 monthly reference for both experiments.
+verification report. The short notebook also writes `short_validation.json`
+and `short_comparison.png` in its own run directory, comparing 46 annual Arctic
+anomalies. The complete workflows check five products from 552 monthly values
+and 46 annual values, using the historical 1981–2010 monthly reference for both
+experiments. The short lesson's equal-month annual result is equivalent for
+these complete years; it does not claim to generate the monthly fields or map.
 
 The devcontainer bootstrap uses official micromamba under `.runtime/bin` to
 create `.runtime/env` from this same manifest, then executes `binder/postBuild`
@@ -36,7 +42,10 @@ The solver ranges are a compatible specification, not a complete lock file. Reco
 
 ## Launch
 
-[Launch YL's notebook](https://mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/main?urlpath=lab/tree/notebooks/00_yl_20_minute_binder_demo.ipynb)
+**[Launch the short annual-stripes lesson — recommended for 20 minutes](https://mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/main?urlpath=lab/tree/notebooks/05_annual_stripes_short_demo.ipynb)**
+
+- [Complete five-product workflow](https://mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/main?urlpath=lab/tree/notebooks/00_yl_20_minute_binder_demo.ipynb)
+- [Practice notebook](https://mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/main?urlpath=lab/tree/notebooks/04_monthly_anomaly_hands_on.ipynb)
 
 For a final seminar invitation, replace `main` with the successfully tested commit SHA. JupyterLab opens the notebook directly through `urlpath=lab/tree/...`.
 
@@ -50,11 +59,19 @@ Binder sessions are temporary. Download changed notebooks and results before lea
 
 Official configuration references: [repo2docker](https://repo2docker.readthedocs.io/en/stable/configuration/) and [Binder JupyterLab links](https://mybinder.readthedocs.io/en/latest/howto/user_interface.html).
 
+## Release verification
+
+Local execution of the 10 November source passed all 45/117/132 cells. Online
+CI and a live Binder check are pending for this release. Earlier successful
+Binder/CI records apply only to their recorded source revisions. See the
+[short-lesson record](../docs/short_annual_verification_20261110.json) and
+[full-workflow record](../docs/nco_options_verification_20261110.json).
+
 ## Keeping the Binder image compact
 
-After the complete build and both real-data notebooks pass,
+After the complete build and all three real-data notebooks pass,
 `scripts/compact_binder_outputs.py` reads `outputs/verification.json` to identify
-only the two notebook runs verified in that build. It preserves their reports
+only the three notebook runs verified in that build. It preserves their reports
 and figures, and removes their generated NetCDF files. The executed notebook
 copies are retained. Raw historical and SSP585 inputs remain cached.
 

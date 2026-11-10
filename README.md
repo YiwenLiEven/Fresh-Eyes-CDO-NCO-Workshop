@@ -9,9 +9,12 @@ original files independently, following
 
 ## Open a notebook
 
-- [Main notebook in Binder](https://mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/main?urlpath=lab/tree/notebooks/00_yl_20_minute_binder_demo.ipynb)
+- **[Short annual-stripes lesson in Binder — recommended for 20 minutes](https://mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/main?urlpath=lab/tree/notebooks/05_annual_stripes_short_demo.ipynb)**:
+  11 CDO + 9 NCO commands, each followed by a result query. Compare final annual
+  Arctic anomalies and stripes. See the [scope and timing guide](docs/SHORT_ANNUAL_DEMO.md).
+- [Complete five-product workflow in Binder](https://mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/main?urlpath=lab/tree/notebooks/00_yl_20_minute_binder_demo.ipynb)
 - [Practice notebook in Binder](https://mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/main?urlpath=lab/tree/notebooks/04_monthly_anomaly_hands_on.ipynb)
-- [BIDS Binder alternative](https://bids.mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/main?urlpath=lab/tree/notebooks/00_yl_20_minute_binder_demo.ipynb)
+- [BIDS Binder alternative for the short lesson](https://bids.mybinder.org/v2/gh/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/main?urlpath=lab/tree/notebooks/05_annual_stripes_short_demo.ipynb)
 - [Notebook files](notebooks/) · [Data, methods and local use](docs/UPDATED_DEMO.md)
 
 The `main` links select the current published notebooks. An older commit-pinned
@@ -28,9 +31,9 @@ closing a temporary Binder session.
 3. Immediately run the next cell: a short CDO/NCO query displays the new file's
    dimensions, dates, variables or sample values. Compare that output with the
    explanation before moving to the next processing command.
-4. View the numerical comparison, maps, Arctic series and annual stripes.
-   An independent Python calculation supplies the reference; its support code
-   remains collapsed.
+4. View the annual-series comparison and stripes. The complete notebooks also
+   include monthly fields and maps. An independent Python calculation supplies
+   the reference; its support code remains collapsed.
 
 Run the commands exactly as shown. In a terminal, use the same command text
 and work in the run directory printed by the Data cell. To repeat the whole
@@ -38,6 +41,14 @@ calculation, return to the first cell and start a new run; earlier files remain
 in their previous output directory.
 
 ## Common calculation
+
+The short lesson calculates annual Arctic temperature, subtracts the 1981–2010
+annual reference, and compares the resulting 46 annual anomalies with the
+complete monthly-anomaly reference. Equal month weights, complete calendar
+years and fixed spatial weights make the annual results equivalent. It does
+not calculate the intermediate monthly fields or the weighted map.
+
+The complete workflow and practice notebook calculate all five products:
 
 | Product | Definition |
 | --- | --- |
@@ -47,7 +58,7 @@ in their previous output directory.
 | Arctic monthly series | Latitude centres 65–90°N, equal grid-point weights |
 | Annual stripes | 46 annual values, equal weight for the 12 monthly samples |
 
-Five products from each route are compared with the independent reference at
+In the complete notebooks, five products from each route are compared with the independent reference at
 an absolute tolerance of 0.0003°C, with coordinate, calendar, baseline and
 annual-mean checks. The teaching commands use fixed dates and record counts for
 1979–2024. The optional 2100 analysis uses the separate batch launcher described
@@ -59,7 +70,7 @@ in the [local guide](docs/UPDATED_DEMO.md#results-and-batch-extension).
 conda env create -f binder/environment.yml
 conda activate fresh-eyes
 python scripts/fetch_updated_data.py
-jupyter lab notebooks/00_yl_20_minute_binder_demo.ipynb
+jupyter lab notebooks/05_annual_stripes_short_demo.ipynb
 ```
 
 On Yiwen's configured Mac, `Launch_Updated_Notebook.command` uses the existing
@@ -74,33 +85,46 @@ remain available for software tests.
 
 ## Verification by revision
 
-The current notebooks with bare command names passed complete local, in-process
-IPython execution with real ACCESS-CM2 data: **119/119 code cells** in the main
-notebook and **134/134** in the practice notebook. The main lesson contains
-20 CDO and 37 NCO processing commands, each followed by a query cell; the practice
-notebook adds six exercise pairs. Every query produced output, and no standard
-error output was recorded.
+The **10 November revision** adds the short annual lesson and simplifies the
+complete NCO selections and record-dimension handling. All three notebooks
+passed complete local, in-process IPython execution with real ACCESS-CM2 data:
 
-All ten product comparisons passed in each notebook; the largest absolute
-difference from the reference was **3.552713678800501e-15°C**. See the
-[plain-command verification record](docs/plain_commands_verification_20261109.json)
-for notebook hashes, cell counts and execution details. It also confirms that
-all 126 command strings, including NCO array literals, reach the installed tools
-unchanged and that failed commands raise an error. Online CI and a live Binder
-check of this revision are pending at publication.
+| Notebook | Processing commands | Code cells passed | Comparison scope |
+| --- | ---: | ---: | --- |
+| Short annual lesson | 11 CDO + 9 NCO | 45/45 | 46 annual anomalies per route |
+| Complete workflow | 20 CDO + 36 NCO | 117/117 | Five products per route |
+| Practice | Complete workflow + six exercise pairs | 132/132 | Five products and exercises |
 
-The preceding `fcc5539...` revision passed [Linux CI run 42593420426](https://github.com/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/actions/runs/42593420426)
-with all 119/134 cells executed. Its main page also passed a focused live Binder
-check of CDO selection/query pairs and an NCO selection/query pair. That record
-predates the current change to bare command names.
+All result queries produced output and all captured stderr streams were empty.
+The short lesson also passed its synthetic-data execution. Its largest real
+annual difference from the complete monthly-anomaly reference was
+**2.61124455e-13°C**. See the
+[short-lesson verification record](docs/short_annual_verification_20261110.json).
+The complete notebooks passed all ten product comparisons, with maximum error
+**3.552713678800501e-15°C**, and their five NCO products exactly matched the
+previous local version. See
+[nco_options_verification_20261110.json](docs/nco_options_verification_20261110.json).
+These JSON files record the local checks before publication. **Online CI and a
+live Binder check are pending for this release.**
 
-The [previous simplified-command record](docs/simple_commands_verification_20261109.json)
-and successful [Linux CI run 42589034931](https://github.com/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/actions/runs/42589034931)
-apply to revision `4228f76...`, whose main and practice notebooks had 24 and 30
-code cells. That version's main page opened and its commands were visually
-checked in Binder; no additional browser Run All was performed. Those checks
-remain evidence for the earlier revision. Comparison with Evgenia's saved
-ESMValTool products is a separate check.
+Earlier evidence remains specific to its source revision:
+
+- `b71a1fd...` (9 November): the
+  [bare-command verification record](docs/plain_commands_verification_20261109.json)
+  and [Linux CI run 42596677410](https://github.com/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/actions/runs/42596677410)
+  cover the previous 119/134-cell notebooks. A focused live Binder check also
+  ran CDO and NCO selection/query pairs. Literal-routing checks preserved all
+  126 practice command strings, including NCO arrays, and checked error propagation.
+- `fcc5539...`: [Linux CI run 42593420426](https://github.com/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/actions/runs/42593420426)
+  executed all 119/134 cells; a focused live Binder check covered selection/query
+  pairs before the change to bare command names.
+- `4228f76...`: the [earlier simplified-command record](docs/simple_commands_verification_20261109.json)
+  and [Linux CI run 42589034931](https://github.com/YiwenLiEven/Fresh-Eyes-CDO-NCO-Workshop/actions/runs/42589034931)
+  cover the earlier 24/30-cell notebooks. Their main page and command layout were
+  checked in Binder without an additional browser Run All.
+
+These earlier checks do not verify the 10 November release. Comparison with
+Evgenia's saved ESMValTool products is a separate check.
 
 ## Attribution
 

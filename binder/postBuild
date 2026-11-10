@@ -22,8 +22,11 @@ jupyter nbconvert --to notebook --execute \
 jupyter nbconvert --to notebook --execute \
   notebooks/04_monthly_anomaly_hands_on.ipynb \
   --output-dir outputs/executed --ExecutePreprocessor.timeout=600
+jupyter nbconvert --to notebook --execute \
+  notebooks/05_annual_stripes_short_demo.ipynb \
+  --output-dir outputs/executed --ExecutePreprocessor.timeout=600
 python scripts/write_verification_report.py
 python scripts/compact_binder_outputs.py
 
 echo "Binder workshop ready: real ACCESS-CM2 historical + SSP585, 1979-2024."
-echo "Synthetic regression tests and both real-data seminar notebooks passed."
+echo "Synthetic regression tests, both full notebooks and the short annual-stripes notebook passed."

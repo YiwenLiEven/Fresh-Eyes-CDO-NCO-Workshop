@@ -1,0 +1,114 @@
+{
+  "date": "2026-11-10",
+  "scope": "Additive annual-only demonstration; full notebooks preserved",
+  "published": false,
+  "live_binder_verified": false,
+  "notebook": "notebooks/05_annual_stripes_short_demo.ipynb",
+  "sha256": "780127885c3e7e3877f67c8b895660b8e788cacf0ff032ab72e4b476d72f1343",
+  "processing_commands": {
+    "cdo": 11,
+    "nco": 9
+  },
+  "checks": {
+    "real": {
+      "code_cells_passed": 45,
+      "nonempty_queries": 20,
+      "elapsed_seconds": 12.349509954452515,
+      "execution_method": "IPython in-process; no Jupyter kernel, browser or Binder session",
+      "report": {
+        "scope": "Annual Arctic anomalies only; no claim of monthly-field/map equivalence from this short route",
+        "input": {
+          "source_id": "ACCESS-CM2",
+          "variant_label": "r1i1p1f1",
+          "period": "1979-2024",
+          "baseline": "1981-2010",
+          "months": 552,
+          "years": 46,
+          "calendar": "proleptic_gregorian",
+          "time_units": "days since 1850-01-01",
+          "synthetic": false
+        },
+        "absolute_tolerance_degC": 0.0003,
+        "reference_method": "Full monthly-climatology and monthly-anomaly calculation",
+        "conditions": {
+          "complete_months_and_finite_grid": true,
+          "equal_month_annual_weights": true,
+          "equal_grid_weights_65_to_90N": true,
+          "baseline": "1981-2010"
+        },
+        "comparisons": {
+          "cdo": {
+            "years": 46,
+            "passed": true,
+            "max_absolute_difference_degC": 6.394884621840902e-14,
+            "baseline_difference_degC": 1.438849039914203e-13,
+            "baseline_anomaly_residual_degC": 1.0658141036401502e-15,
+            "annual_temperature_and_subtraction_checked": true
+          },
+          "nco": {
+            "years": 46,
+            "passed": true,
+            "max_absolute_difference_degC": 2.611244553918368e-13,
+            "baseline_difference_degC": 4.778399897986674e-13,
+            "baseline_anomaly_residual_degC": 1.3026616822268502e-15,
+            "annual_temperature_and_subtraction_checked": true
+          }
+        },
+        "nco_output_metadata": "Year-labelled tas/time series; no interval-bound or unavailable-coordinate links",
+        "cdo_annual_bounds_full_year": true,
+        "passed": true
+      }
+    },
+    "synthetic": {
+      "code_cells_passed": 45,
+      "nonempty_queries": 20,
+      "elapsed_seconds": 7.112764835357666,
+      "execution_method": "IPython in-process; no Jupyter kernel, browser or Binder session",
+      "report": {
+        "scope": "Annual Arctic anomalies only; no claim of monthly-field/map equivalence from this short route",
+        "input": {
+          "source_id": "WORKSHOP-DEMO",
+          "variant_label": "r1i1p1f1",
+          "period": "1979-2024",
+          "baseline": "1981-2010",
+          "months": 552,
+          "years": 46,
+          "calendar": "proleptic_gregorian",
+          "time_units": "days since 1850-01-01",
+          "synthetic": true
+        },
+        "absolute_tolerance_degC": 0.0003,
+        "reference_method": "Full monthly-climatology and monthly-anomaly calculation",
+        "conditions": {
+          "complete_months_and_finite_grid": true,
+          "equal_month_annual_weights": true,
+          "equal_grid_weights_65_to_90N": true,
+          "baseline": "1981-2010"
+        },
+        "comparisons": {
+          "cdo": {
+            "years": 46,
+            "passed": true,
+            "max_absolute_difference_degC": 3.552713678800501e-15,
+            "baseline_difference_degC": 0.0,
+            "baseline_anomaly_residual_degC": 8.881784197001252e-16,
+            "annual_temperature_and_subtraction_checked": true
+          },
+          "nco": {
+            "years": 46,
+            "passed": true,
+            "max_absolute_difference_degC": 8.215650382226158e-15,
+            "baseline_difference_degC": 6.394884621840902e-14,
+            "baseline_anomaly_residual_degC": 1.0066022089934752e-15,
+            "annual_temperature_and_subtraction_checked": true
+          }
+        },
+        "nco_output_metadata": "Year-labelled tas/time series; no interval-bound or unavailable-coordinate links",
+        "cdo_annual_bounds_full_year": true,
+        "passed": true
+      }
+    }
+  },
+  "full_notebooks_unchanged": true,
+  "passed": true
+}

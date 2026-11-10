@@ -13,6 +13,7 @@ import stat
 ROOT = Path(__file__).resolve().parents[1]
 ROUTES = ('python', 'cdo', 'nco')
 PRODUCTS = ('climatology', 'anomaly', 'map_mean', 'arctic_monthly', 'arctic_annual')
+SHORT_NOTEBOOK = '05_annual_stripes_short_demo'
 
 
 def require(condition, message):
@@ -36,15 +37,20 @@ def bounded_path(relative):
     return current
 
 
-def read_validation(relative, synthetic):
+def read_validation(relative, synthetic, annual_only=False):
     path = bounded_path(relative)
     data = json.loads(path.read_text())
     require(data.get('passed') is True, f'Unverified run: {relative}')
     require(data['input']['synthetic'] is synthetic, f'Unexpected data mode: {relative}')
     require(data['input']['period'] == '1979-2024', f'Unexpected period: {relative}')
-    require(len(data['comparisons']) == 10 and
+    expected_comparisons = 2 if annual_only else 10
+    require(len(data['comparisons']) == expected_comparisons and
             all(item.get('passed') is True for item in data['comparisons'].values()),
             f'Incomplete comparisons: {relative}')
+    if annual_only:
+        require(set(data['comparisons']) == {'cdo', 'nco'} and
+                all(item.get('years') == 46 for item in data['comparisons'].values()),
+                f'Incomplete annual-series comparisons: {relative}')
     return path.parent
 
 
@@ -74,9 +80,9 @@ def main():
             'Unexpected main build evidence location')
     main_run = read_validation(verification['main_evidence_file'], synthetic=False)
     synthetic_run = read_validation('outputs/updated_build/updated_validation.json', synthetic=True)
-    expected_notebooks = {'00_yl_20_minute_binder_demo', '04_monthly_anomaly_hands_on'}
+    expected_notebooks = {'00_yl_20_minute_binder_demo', '04_monthly_anomaly_hands_on', SHORT_NOTEBOOK}
     require(set(verification['notebooks']) == expected_notebooks,
-            'Expected both verified teaching notebooks')
+            'Expected both full notebooks and the verified short annual notebook')
 
     # Validate the entire plan before deleting anything.
     notebook_runs = set()
@@ -86,11 +92,15 @@ def main():
                 evidence.get('error_outputs') == 0 and evidence.get('data_mode') == 'real',
                 f'Notebook is not fully verified: {name}')
         relative = evidence['run_validation_file']
-        require(re.fullmatch(r'outputs/updated_real_\d{8}T\d{6}_[0-9a-f]{6}/updated_validation\.json', relative),
+        annual_only = name == SHORT_NOTEBOOK
+        pattern = (r'outputs/short_annual_real_\d{8}T\d{6}_[0-9a-f]{6}/short_validation\.json'
+                   if annual_only else
+                   r'outputs/updated_real_\d{8}T\d{6}_[0-9a-f]{6}/updated_validation\.json')
+        require(re.fullmatch(pattern, relative),
                 f'Unexpected notebook output location: {relative}')
-        run = read_validation(relative, synthetic=False)
-        require((run / 'updated_comparison.png').is_file() and
-                not (run / 'updated_comparison.png').is_symlink(),
+        run = read_validation(relative, synthetic=False, annual_only=annual_only)
+        figure = run / ('short_comparison.png' if annual_only else 'updated_comparison.png')
+        require(figure.is_file() and not figure.is_symlink(),
                 f'Missing comparison figure: {relative}')
         notebook_runs.add(run)
 
