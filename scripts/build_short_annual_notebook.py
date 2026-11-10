@@ -141,10 +141,34 @@ joins records, computes means and subtracts the reference temperature.
         *pairs("nco", NCO_SHORT_STEPS, "04"),
         md('''## 05 · Compare the annual series
 
-Check all 46 annual anomalies against the independent monthly-anomaly reference.
-The comparison also checks the annual temperatures, 1981–2010 reference and
-near-zero mean anomaly during that reference period. This is an annual-result
-comparison; the full notebooks contain the five-product comparison.
+**These three files supply the three curves and their climate stripes.**
+They contain results already calculated in the preceding steps.
+Paths below are relative to the current results folder.
+
+| Plot label | Data file | Variable | What it contains |
+|---|---|---|---|
+| Python reference | `python/arctic_annual.nc` | `tas_anom` | Independent Python calculation using monthly climatology and monthly anomalies |
+| CDO | `cdo/annual_anomaly.nc` | `tas` | Annual anomalies calculated by the CDO commands above |
+| NCO | `nco/annual_anomaly.nc` | `tas` | Annual anomalies calculated by the NCO commands above |
+
+All three select 1979–2014 from `data/historical.nc` and 2015–2024 from
+`data/ssp585.nc`, using the same ACCESS-CM2 data. Each plotted series contains **46 annual
+Arctic anomalies (65–90°N, 1979–2024), in °C relative to 1981–2010**, with
+equal grid-point and monthly weights. The Python reference is calculated
+independently in this lesson; it is not an ESMValTool output file.
+
+[Open the full comparison and plotting script: compare_short_annual.py](../scripts/compare_short_annual.py)
+
+The Python source below is the actual script used by the next calculation cell.
+'''),
+        code('''from IPython.display import Code
+display(Code(filename=str(ROOT / "scripts/compare_short_annual.py"), language="python"))''', support=True),
+        md('''Run the next cell to list the input files and check that the 46 annual values
+agree. The script also reads the CDO and NCO `annual_temperature.nc` and
+`reference.nc`, plus `python/climatology.nc`, to check the temperatures and
+baseline; these files do not supply additional curves. It checks the near-zero
+mean anomaly in 1981–2010 as well. This is an annual-result comparison; the
+full notebooks contain the five-product comparison.
 '''),
         code('''subprocess.run([sys.executable, str(ROOT / "scripts/compare_short_annual.py"), str(RUN)], check=True)
 report = json.loads((RUN / "short_validation.json").read_text())

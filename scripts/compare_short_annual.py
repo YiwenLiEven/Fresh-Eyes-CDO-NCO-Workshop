@@ -1,4 +1,9 @@
-"""Validate and plot annual results; never supplies CDO/NCO intermediates."""
+"""Compare three annual-anomaly files produced earlier in the lesson.
+
+The curves and stripes read only the three files in PLOT_INPUTS below.
+The other files check the annual temperatures and reference-period mean.
+This script does not calculate or supply CDO/NCO processing intermediates.
+"""
 from pathlib import Path
 import argparse
 import json
@@ -10,6 +15,15 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
+
+
+# Each row names one column in the comparison figure:
+# (figure label, file relative to the current results folder, variable).
+PLOT_INPUTS = (
+    ("Python reference", "python/arctic_annual.nc", "tas_anom"),
+    ("CDO", "cdo/annual_anomaly.nc", "tas"),
+    ("NCO", "nco/annual_anomaly.nc", "tas"),
+)
 
 
 def annual_series(path, variable):
@@ -31,7 +45,20 @@ def compare(run):
     tolerance = 3e-4
     info = json.loads((run / "python/input_contract.json").read_text())
     assert info["months"] == 552 and info["years"] == 46
-    reference = annual_series(run / "python/arctic_annual.nc", "tas_anom")
+    print("Files used for the curves and climate stripes:")
+    for label, filename, variable in PLOT_INPUTS:
+        print(f"  {label}: {filename} -> {variable}")
+    print("  1979-2024: 46 annual Arctic anomalies (degC); reference 1981-2010.")
+    print("  Arctic 65-90 N; equal grid-point and monthly weights.")
+    print("Python reference: independent calculation, not saved ESMValTool output.")
+    print("Additional checks: python/climatology.nc, cdo/annual_temperature.nc,")
+    print("  nco/annual_temperature.nc, cdo/reference.nc, nco/reference.nc.")
+    print("Data coverage: python/input_contract.json.\n")
+    arrays = {
+        label: annual_series(run / filename, variable)
+        for label, filename, variable in PLOT_INPUTS
+    }
+    reference = arrays["Python reference"]
     with xr.open_dataset(run / "python/climatology.nc") as ds:
         baseline = float(ds.tas.sel(lat=slice(65, 90)).mean())
     report = {
@@ -39,6 +66,14 @@ def compare(run):
         "input": info,
         "absolute_tolerance_degC": tolerance,
         "reference_method": "Full monthly-climatology and monthly-anomaly calculation",
+        "plot_inputs": [
+            {"label": label, "file": filename, "variable": variable}
+            for label, filename, variable in PLOT_INPUTS
+        ],
+        "additional_check_inputs": [
+            "python/climatology.nc", "cdo/annual_temperature.nc",
+            "nco/annual_temperature.nc", "cdo/reference.nc", "nco/reference.nc",
+        ],
         "conditions": {
             "complete_months_and_finite_grid": True,
             "equal_month_annual_weights": True,
@@ -47,9 +82,8 @@ def compare(run):
         },
         "comparisons": {},
     }
-    arrays = {"Python reference": reference}
     for route in ("cdo", "nco"):
-        values = annual_series(run / route / "annual_anomaly.nc", "tas")
+        values = arrays[route.upper()]
         temperatures = annual_series(run / route / "annual_temperature.nc", "tas")
         with xr.open_dataset(run / route / "reference.nc") as ds:
             actual_baseline = float(ds.tas.squeeze())
@@ -67,7 +101,6 @@ def compare(run):
             "baseline_anomaly_residual_degC": residual,
             "annual_temperature_and_subtraction_checked": True,
         }
-        arrays[route.upper()] = values
         print(f"PASS {route}: 46 annual anomalies; maximum difference = {error:.9g} °C")
     with xr.open_dataset(run / "nco/annual_anomaly.nc") as ds:
         assert set(ds.variables) == {"tas", "time"}
@@ -91,11 +124,13 @@ def compare(run):
     limit = max(float(abs(a).max()) for a in arrays.values())
     fig, axes = plt.subplots(2, 3, figsize=(13, 5.3), layout="constrained",
                              gridspec_kw={"height_ratios": [2.4, 1]})
-    for column, (label, values) in enumerate(arrays.items()):
+    for column, (label, filename, variable) in enumerate(PLOT_INPUTS):
+        values = arrays[label]
         ax = axes[0, column]
         ax.plot(years, values, color="#235c7c", lw=1.6)
         ax.axhline(0, color="0.5", lw=.7)
-        ax.set(title=label, xlabel="Year", ylabel="Annual anomaly (°C)",
+        ax.set_title(f"{label}\n{filename} · {variable}", fontsize=10)
+        ax.set(xlabel="Year", ylabel="Annual anomaly (°C)",
                xlim=(1978.5, 2024.5), ylim=(-limit * 1.12, limit * 1.12))
         stripe = axes[1, column].imshow(values[None, :], extent=[1978.5, 2024.5, 0, 1],
                     aspect="auto", cmap="bwr", vmin=-limit, vmax=limit)
